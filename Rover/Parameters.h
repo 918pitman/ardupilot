@@ -316,6 +316,10 @@ public:
     AP_Beacon beacon;
 #endif
 
+#if AP_SWIVEL_ENABLED
+    AP_SWIVEL swivel;
+#endif
+
     // wheel encoders
     AP_WheelEncoder wheel_encoder;
     AP_WheelRateControl wheel_rate_control;
