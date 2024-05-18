@@ -299,9 +299,6 @@ protected:
     float G_Dt;
 
     // sensor drivers
-#if AP_SWIVEL_ENABLED
-   AP_SWIVEL swivel;
-#endif
 #if AP_GPS_ENABLED
     AP_GPS gps;
 #endif
@@ -445,6 +442,10 @@ protected:
 
     // Check if this mode can be entered from the GCS
     bool block_GCS_mode_change(uint8_t mode_num, const uint8_t *mode_list, uint8_t mode_list_length) const;
+
+#if AP_SWIVEL_ENABLED
+   AP_SWIVEL swivel;
+#endif
 
 private:
 
