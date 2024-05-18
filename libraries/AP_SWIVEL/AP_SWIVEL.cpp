@@ -47,7 +47,7 @@ void AP_SWIVEL::update(void)
         _measurement = _measurement + 0.1;
     }
     else {
-        _measurement = 1.111
+        _measurement = 1.111;
         //_measurement = rssi_analog_source->read_latest();
     }
 
