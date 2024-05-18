@@ -299,9 +299,9 @@ protected:
     float G_Dt;
 
     // sensor drivers
-#if AP_SWIVEL_ENABLED
-    AP_SWIVEL swivel;
-#endif
+//#if AP_SWIVEL_ENABLED
+//    AP_SWIVEL swivel;
+//#endif
 #if AP_GPS_ENABLED
     AP_GPS gps;
 #endif

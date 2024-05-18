@@ -36,7 +36,7 @@ void Rover::init_ardupilot()
     battery.init();
 
 #if AP_SWIVEL_ENABLED
-    // initialise stats module
+    // initialise swivel module
     swivel.init();
 #endif
 
