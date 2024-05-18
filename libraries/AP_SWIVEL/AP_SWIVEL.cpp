@@ -20,7 +20,7 @@ const AP_Param::GroupInfo AP_SWIVEL::var_info[] = {
     // @DisplayName: Receiver SWIVEL sensing pin
     // @Description: Pin used to read the SWIVEL voltage or PWM value
     // @User: Standard
-    AP_GROUPINFO("ANA_PIN", 0, AP_SWIVEL, rssi_analog_pin,  BOARD_SWIVEL_ANA_PIN)
+    AP_GROUPINFO("ANA_PIN", 0, AP_SWIVEL, rssi_analog_pin,  BOARD_SWIVEL_ANA_PIN),
 
     AP_GROUPEND
 };
