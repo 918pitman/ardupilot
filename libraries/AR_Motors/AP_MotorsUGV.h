@@ -194,7 +194,7 @@ private:
 
     // external references
     AP_WheelRateControl &_rate_controller;
-    AP_SWIVEL *swivel = AP::swivel();
+    AP_SWIVEL &swivel = AP::swivel();
 
     static const int8_t AP_MOTORS_NUM_MOTORS_MAX = 4;
 
