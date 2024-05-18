@@ -527,6 +527,7 @@ bool AP_MotorsUGV::pre_arm_check(bool report) const
     }
 
     float angle = 0.123;
+    swivel.update();
     swivel.get_angle(angle);
     GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "Measurement from Motors lib: %f", angle);
 
