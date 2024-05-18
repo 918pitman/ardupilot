@@ -1,3 +1,5 @@
+#pragma once
+
 #include "AP_SWIVEL_config.h"
  
 #if AP_SWIVEL_ENABLED
