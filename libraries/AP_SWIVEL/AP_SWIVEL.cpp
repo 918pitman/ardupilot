@@ -30,9 +30,9 @@ const AP_Param::GroupInfo AP_SWIVEL::var_info[] = {
 AP_SWIVEL::AP_SWIVEL(void)
 {       
     AP_Param::setup_object_defaults(this, var_info);
-    if (_singleton != nullptr) {
-        AP_HAL::panic("AP_SWIVEL must be singleton");
-    }
+    // if (_singleton != nullptr) {
+    //     AP_HAL::panic("AP_SWIVEL must be singleton");
+    // }
     _singleton = this;
 }
 
