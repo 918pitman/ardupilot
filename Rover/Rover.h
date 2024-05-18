@@ -45,12 +45,8 @@
 #include <AC_PrecLand/AC_PrecLand_config.h>
 #include <AP_Follow/AP_Follow_config.h>
 #include <AP_ExternalControl/AP_ExternalControl_config.h>
-#include <AP_SWIVEL/AP_SWIVEL_config.h>
 #if AP_EXTERNAL_CONTROL_ENABLED
 #include "AP_ExternalControl_Rover.h"
-#endif
-#if AP_SWIVEL_ENABLED
-#include <AP_SWIVEL/AP_SWIVEL.h>
 #endif
 
 // Configuration
@@ -159,10 +155,6 @@ private:
     // external control implementation
 #if AP_EXTERNAL_CONTROL_ENABLED
     AP_ExternalControl_Rover external_control;
-#endif
-
-#if AP_SWIVEL_ENABLED
-    AP_SWIVEL swivel;
 #endif
 
 #if AP_OPTICALFLOW_ENABLED

@@ -35,6 +35,7 @@
 #include <AP_Compass/AP_Compass.h>
 #include <AP_EFI/AP_EFI.h>
 #include <AP_ExternalControl/AP_ExternalControl_config.h>
+#include <AP_SWIVEL/AP_SWIVEL.h>
 #include <AP_GPS/AP_GPS.h>
 #include <AP_Generator/AP_Generator.h>
 #include <AP_Notify/AP_Notify.h>                    // Notify library
@@ -298,6 +299,9 @@ protected:
     float G_Dt;
 
     // sensor drivers
+#if AP_SWIVEL_ENABLED
+    AP_SWIVEL swivel;
+#endif
 #if AP_GPS_ENABLED
     AP_GPS gps;
 #endif
