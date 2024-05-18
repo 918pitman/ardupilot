@@ -44,7 +44,7 @@ void AP_SWIVEL::init(void)
 void AP_SWIVEL::update(void)
 {
     if (!rssi_analog_source || !rssi_analog_source->set_pin(rssi_analog_pin)) {
-        _measurement = 0;
+        _measurement = _measurement + 0.1;
     }
     else {
         _measurement = rssi_analog_source->read_latest();
