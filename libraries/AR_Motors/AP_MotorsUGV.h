@@ -2,7 +2,7 @@
 
 #include <AP_Arming/AP_Arming.h>
 #include <AP_WheelEncoder/AP_WheelRateControl.h>
-#include <AP_SWIVEL/AP_SWIVEL.h>
+//include <AP_SWIVEL/AP_SWIVEL.h>
 #include <SRV_Channel/SRV_Channel.h>
 
 class AP_MotorsUGV {
@@ -194,7 +194,7 @@ private:
 
     // external references
     AP_WheelRateControl &_rate_controller;
-    AP_SWIVEL &swivel = AP::swivel();
+    //AP_SWIVEL &swivel = AP::swivel();
 
     static const int8_t AP_MOTORS_NUM_MOTORS_MAX = 4;
 
