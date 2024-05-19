@@ -138,51 +138,6 @@ void AP_RSSI::update(void)
 // 0.0 represents weakest signal, 1.0 represents maximum signal.
 float AP_RSSI::read_receiver_rssi()
 {
-    switch (RssiType(rssi_type.get())) {
-        case RssiType::TYPE_DISABLED:
-            return 0.0f;
-        case RssiType::ANALOG_PIN:
-            return read_pin_rssi();
-        case RssiType::RC_CHANNEL_VALUE:
-            return read_channel_rssi();
-        case RssiType::RECEIVER: {
-            int16_t rssi = RC_Channels::get_receiver_rssi();
-            if (rssi != -1) {
-                return rssi * (1/255.0);
-            }
-            return 0.0f;
-        }
-        case RssiType::PWM_PIN:
-            return read_pwm_pin_rssi();
-        case RssiType::TELEMETRY_RADIO_RSSI:
-            return read_telemetry_radio_rssi();
-    }
-    // should never get to here
-    return 0.0f;
-}
-
-// Only valid for RECEIVER type RSSI selections. Returns -1 if protocol does not provide link quality report.
-float AP_RSSI::read_receiver_link_quality()
-{
-    if (RssiType(rssi_type.get()) == RssiType::RECEIVER) {
-        return RC_Channels::get_receiver_link_quality();
-    }
-    return -1;
-}
-
-// Read the receiver RSSI value as an 8-bit integer
-// 0 represents weakest signal, 255 represents maximum signal.
-uint8_t AP_RSSI::read_receiver_rssi_uint8()
-{
-    return read_receiver_rssi() * 255; 
-}
-
-// Private
-// -------
-
-// read the RSSI value from an analog pin - returns float in range 0.0 to 1.0
-float AP_RSSI::read_pin_rssi()
-{
     if (!rssi_analog_source || !rssi_analog_source->set_pin(rssi_analog_pin)) {
         return 0;
     }
@@ -192,52 +147,11 @@ float AP_RSSI::read_pin_rssi()
     return _measurement;
 }
 
-// read the RSSI value from a PWM value on a RC channel
-float AP_RSSI::read_channel_rssi()
+// Read the receiver RSSI value as an 8-bit integer
+// 0 represents weakest signal, 255 represents maximum signal.
+uint8_t AP_RSSI::read_receiver_rssi_uint8()
 {
-    RC_Channel *c = rc().channel(rssi_channel-1);
-    if (c == nullptr) {
-        return 0.0f;
-    }
-    uint16_t rssi_channel_value = c->get_radio_in();
-    float channel_rssi = scale_and_constrain_float_rssi(rssi_channel_value, rssi_channel_low_pwm_value, rssi_channel_high_pwm_value);
-    return channel_rssi;    
-}
-
-// read the PWM value from a pin
-float AP_RSSI::read_pwm_pin_rssi()
-{
-    // check if pin has changed and configure interrupt handlers if required:
-    if (!pwm_state.pwm_source.set_pin(rssi_analog_pin, "RSSI")) {
-        // disabled (either by configuration or failure to attach interrupt)
-        return 0.0f;
-    }
-
-    uint16_t pwm_us = pwm_state.pwm_source.get_pwm_us();
-
-    const uint32_t now = AP_HAL::millis();
-    if (pwm_us == 0) {
-        // no reading; check for timeout:
-        if (now - pwm_state.last_reading_ms > 1000) {
-            // no reading for a second - something is broken
-            pwm_state.rssi_value = 0.0f;
-        }
-    } else {
-        // a new reading - convert pwm value to rssi value
-        pwm_state.rssi_value = scale_and_constrain_float_rssi(pwm_us, rssi_channel_low_pwm_value, rssi_channel_high_pwm_value);
-        pwm_state.last_reading_ms = now;
-    }
-
-    return pwm_state.rssi_value;
-}
-
-float AP_RSSI::read_telemetry_radio_rssi()
-{
-#if HAL_GCS_ENABLED
-    return GCS_MAVLINK::telemetry_radio_rssi();
-#else
-    return 0;
-#endif
+    return read_receiver_rssi() * 255; 
 }
 
 // Scale and constrain a float rssi value to 0.0 to 1.0 range 

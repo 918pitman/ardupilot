@@ -50,11 +50,9 @@ public:
     void update(void);
     // return true if rssi reading is enabled
     bool enabled() const { return RssiType(rssi_type.get()) != RssiType::TYPE_DISABLED; }
-
     // Read the receiver RSSI value as a float 0.0f - 1.0f.
     // 0.0 represents weakest signal, 1.0 represents maximum signal.
     float read_receiver_rssi();
-    float read_receiver_link_quality();
     // Read the receiver RSSI value as an 8-bit integer
     // 0 represents weakest signal, 255 represents maximum signal.
     uint8_t read_receiver_rssi_uint8();   
@@ -78,27 +76,6 @@ private:
     // Analog Inputs
     // a pin for reading the receiver RSSI voltage. 
     AP_HAL::AnalogSource *rssi_analog_source;
-
-    // PWM input
-    struct PWMState {
-        int8_t last_warn_pin; // last pin used for reading pwm (used to recognise change failure in pin assignment)
-        uint32_t last_reading_ms;      // system time of last read (used for health reporting)
-        float rssi_value;              // last calculated RSSI value
-        // the following two members are updated by the interrupt handler
-        AP_HAL::PWMSource pwm_source;
-    } pwm_state;
-
-    // read the RSSI value from an analog pin - returns float in range 0.0 to 1.0
-    float read_pin_rssi();
-
-    // read the RSSI value from a PWM value on a RC channel
-    float read_channel_rssi();
-
-    // read the PWM value from a pin
-    float read_pwm_pin_rssi();
-
-    // read the (RC) RSSI value from telemetry radio RSSI (e.g. rfd900x pass-through)
-    float read_telemetry_radio_rssi();
 
     // Scale and constrain a float rssi value to 0.0 to 1.0 range
     float scale_and_constrain_float_rssi(float current_rssi_value, float low_rssi_range, float high_rssi_range);
