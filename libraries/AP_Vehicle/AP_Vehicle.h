@@ -42,7 +42,7 @@
 #include <AP_RangeFinder/AP_RangeFinder.h>
 #include <AP_Relay/AP_Relay.h>                      // APM relay
 #include <AP_RSSI/AP_RSSI.h>                        // RSSI Library
-#include <AP_SWIVEL/AP_SWIVEL.h>                        // SWIVEL Library
+#include <AP_SWIVEL/AP_SWIVEL.h>                    // SWIVEL Library
 #include <AP_Scheduler/AP_Scheduler.h>
 #include <AP_SerialManager/AP_SerialManager.h>      // Serial manager library
 #include <AP_ServoRelayEvents/AP_ServoRelayEvents.h>

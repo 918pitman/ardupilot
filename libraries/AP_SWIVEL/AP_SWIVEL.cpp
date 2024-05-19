@@ -33,7 +33,7 @@ const AP_Param::GroupInfo AP_SWIVEL::var_info[] = {
 
     // @Param: ANA_PIN
     // @DisplayName: Receiver SWIVEL sensing pin
-    // @Description: Pin used to read the SWIVEL voltage or PWM value
+    // @Description: Pin used to read the SWIVEL voltage
     // @Values: 8:V5 Nano,11:Pixracer,13:Pixhawk ADC4,14:Pixhawk ADC3,15:Pixhawk ADC6/Pixhawk2 ADC,50:AUX1,51:AUX2,52:AUX3,53:AUX4,54:AUX5,55:AUX6,103:Pixhawk SBUS
     // @User: Standard
     AP_GROUPINFO("ANA_PIN", 0, AP_SWIVEL, swivel_analog_pin,  8),
@@ -48,9 +48,9 @@ const AP_Param::GroupInfo AP_SWIVEL::var_info[] = {
 AP_SWIVEL::AP_SWIVEL()
 {       
     AP_Param::setup_object_defaults(this, var_info);
-    if (_singleton) {
-        AP_HAL::panic("Too many SWIVEL sensors");
-    }
+    // if (_singleton) {
+    //     AP_HAL::panic("Too many SWIVEL sensors");
+    // }
     _singleton = this;
 }
 
