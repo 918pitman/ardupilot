@@ -22,22 +22,19 @@ void AP_Periph_FW::can_swivel_update()
     last_update_ms = now;
     swivel.update();
 
-    uavcan_equipment_air_data_RawAirData pkt {};
+    uavcan_equipment_actuator_Status pkt {};
 
-    // unfilled elements are NaN
-    pkt.static_pressure = nanf("");
-    pkt.static_pressure_sensor_temperature = nanf("");
-    pkt.differential_pressure_sensor_temperature = nanf("");
-    pkt.pitot_temperature = nanf("");
-    pkt.differential_pressure = nanf("");
-    // populate the elements we have
-    pkt.static_air_temperature = swivel.get_angle();
+    pkt.actuator_id = 0;
+    pkt.position = swivel.get_angle();
+    pkt.force = NAN;
+    pkt.speed = NAN;
+    pkt.power_rating_pct = POWER_RATING_PCT_UNKNOWN;
 
-    uint8_t buffer[UAVCAN_EQUIPMENT_AIR_DATA_RAWAIRDATA_MAX_SIZE] {};
-    uint16_t total_size = uavcan_equipment_air_data_RawAirData_encode(&pkt, buffer, !periph.canfdout());
+    uint8_t buffer[UAVCAN_EQUIPMENT_ACTUATOR_STATUS_MAX_SIZE] {};
+    uint16_t total_size = uavcan_equipment_actuator_Status_encode(&pkt, buffer, !periph.canfdout());
 
-    canard_broadcast(UAVCAN_EQUIPMENT_AIR_DATA_RAWAIRDATA_SIGNATURE,
-                    UAVCAN_EQUIPMENT_AIR_DATA_RAWAIRDATA_ID,
+    canard_broadcast(UAVCAN_EQUIPMENT_ACTUATOR_STATUS_SIGNATURE,
+                    UAVCAN_EQUIPMENT_ACTUATOR_STATUS_ID,
                     CANARD_TRANSFER_PRIORITY_LOW,
                     &buffer[0],
                     total_size);
