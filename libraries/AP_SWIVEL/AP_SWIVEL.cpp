@@ -48,9 +48,9 @@ const AP_Param::GroupInfo AP_SWIVEL::var_info[] = {
 AP_SWIVEL::AP_SWIVEL()
 {       
     AP_Param::setup_object_defaults(this, var_info);
-    // if (_singleton) {
-    //     AP_HAL::panic("Too many SWIVEL sensors");
-    // }
+    if (_singleton) {
+        AP_HAL::panic("Too many SWIVEL sensors");
+    }
     _singleton = this;
 }
 
