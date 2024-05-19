@@ -133,7 +133,7 @@ const AP_Scheduler::Task Rover::scheduler_tasks[] = {
     SCHED_TASK_CLASS(AP_Scheduler,        &rover.scheduler,        update_logging, 0.1, 200, 114),
 #endif
 #if AP_RSSI_ENABLED
-    SCHED_TASK_CLASS(AP_SWIVEL,             &rover.swivel,             update,         1,  300,  117),
+    SCHED_TASK_CLASS(AP_SWIVEL,             &rover.g2.swivel,             update,         1,  300,  117),
 #endif
 #if STATS_ENABLED == ENABLED
     SCHED_TASK(stats_update,            1,    200, 120),
