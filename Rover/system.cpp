@@ -81,7 +81,7 @@ void Rover::init_ardupilot()
 #endif
 
 #if AP_SWIVEL_ENABLED
-    g2.swivel.init()
+    g2.swivel.init();
 #endif
 
     // and baro for EKF
