@@ -183,7 +183,7 @@ float AP_RSSI::read_pin_rssi()
     if (!rssi_analog_source || !rssi_analog_source->set_pin(rssi_analog_pin)) {
         return 0;
     }
-    float current_analog_voltage = rssi_analog_source->voltage_average();
+    float current_analog_voltage = rssi_analog_source->read_latest();
 
     return scale_and_constrain_float_rssi(current_analog_voltage, rssi_analog_pin_range_low, rssi_analog_pin_range_high);
 }

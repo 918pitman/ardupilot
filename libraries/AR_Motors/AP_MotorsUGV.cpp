@@ -525,12 +525,9 @@ bool AP_MotorsUGV::pre_arm_check(bool report) const
             return false;
         }
     }
-
-    AP_HAL::AnalogSource *_source;
-    _source = hal.analogin->channel(10);
-    float _measurement = _source->read_latest();
-    GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "Measurement from Motors lib: %f", _measurement);
-
+    
+    float angle = 0;
+    GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "Measurement from Motors lib: %f", angle);
 
     // Check relays are configured for brushed with relay outputs
 #if AP_RELAY_ENABLED
