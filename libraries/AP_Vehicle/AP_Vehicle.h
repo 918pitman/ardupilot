@@ -314,6 +314,10 @@ protected:
     AP_RSSI rssi;
 #endif
 
+#if AP_SWIVEL_ENABLED
+    AP_SWIVEL swivel;
+#endif
+
 #if HAL_RUNCAM_ENABLED
     AP_RunCam runcam;
 #endif
