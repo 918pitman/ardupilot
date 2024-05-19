@@ -43,15 +43,13 @@ void AP_SWIVEL::init(void)
 
 void AP_SWIVEL::update(void)
 {
-    // if (!rssi_analog_source->set_pin(rssi_analog_pin))
-    // {
-    //     _measurement = _measurement + 0.1;
-    // }
-    // else
-    // {
-    //     _measurement = rssi_analog_source->read_latest();
-    // }
-    _measurement = rssi_analog_source->read_latest();
+    if (!rssi_analog_source || !rssi_analog_source->set_pin(rssi_analog_pin)) {
+        _measurement = _measurement + 0.1;
+    }
+    else {
+        //_measurement = 1.111;
+        _measurement = rssi_analog_source->read_latest();
+    }
 
 }
 
