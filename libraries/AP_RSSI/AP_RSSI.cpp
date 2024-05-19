@@ -166,6 +166,7 @@ void AP_RSSI::update(void)
 // 0.0 represents weakest signal, 1.0 represents maximum signal.
 float AP_RSSI::read_receiver_rssi()
 {
+    update();
     return _reading;
 }
 
@@ -196,7 +197,7 @@ float AP_RSSI::read_pin_rssi()
     }
     float current_analog_voltage = rssi_analog_source->read_latest();
 
-    return scale_and_constrain_float_rssi(current_analog_voltage*10, rssi_analog_pin_range_low, rssi_analog_pin_range_high);
+    return scale_and_constrain_float_rssi(current_analog_voltage, rssi_analog_pin_range_low, rssi_analog_pin_range_high);
 }
 
 // read the RSSI value from a PWM value on a RC channel
