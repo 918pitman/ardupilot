@@ -38,17 +38,17 @@ AP_SWIVEL::AP_SWIVEL(void)
 
 void AP_SWIVEL::init(void)
 {   
-    rssi_analog_source = hal.analogin->channel(ANALOG_INPUT_NONE);    
+    rssi_analog_source = hal.analogin->channel(rssi_analog_pin);    
 }
 
 void AP_SWIVEL::update(void)
 {
-    if (!rssi_analog_source || !rssi_analog_source->set_pin(rssi_analog_pin)) {
+    if (!rssi_analog_source->set_pin(rssi_analog_pin)) {
         _measurement = _measurement + 0.1;
     }
-    else {
-        _measurement = 1.111;
-        //_measurement = rssi_analog_source->read_latest();
+    else
+    {
+        _measurement = rssi_analog_source->read_latest();
     }
 
 }
