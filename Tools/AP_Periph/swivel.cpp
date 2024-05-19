@@ -22,18 +22,38 @@ void AP_Periph_FW::can_swivel_update()
     last_update_ms = now;
     swivel.update();
 
-    ardupilot_equipment_feedback_SteerAngle pkt {};
+    uavcan_equipment_air_data_RawAirData pkt {};
 
-    pkt.steer_angle = swivel.get_angle();
+    // unfilled elements are NaN
+    pkt.static_pressure = nanf("");
+    pkt.static_pressure_sensor_temperature = nanf("");
+    pkt.differential_pressure_sensor_temperature = nanf("");
+    pkt.pitot_temperature = nanf("");
+    pkt.differential_pressure = nanf("");
+    // populate the elements we have
+    pkt.static_air_temperature = swivel.get_angle();
 
-    uint8_t buffer[ARDUPILOT_EQUIPMENT_FEEDBACK_STEERANGLE_MAX_SIZE] {};
-    uint16_t total_size = ardupilot_equipment_feedback_SteerAngle_encode(&pkt, buffer, !periph.canfdout());
+    uint8_t buffer[UAVCAN_EQUIPMENT_AIR_DATA_RAWAIRDATA_MAX_SIZE] {};
+    uint16_t total_size = uavcan_equipment_air_data_RawAirData_encode(&pkt, buffer, !periph.canfdout());
 
-    canard_broadcast(ARDUPILOT_EQUIPMENT_FEEDBACK_STEERANGLE_SIGNATURE,
-                     ARDUPILOT_EQUIPMENT_FEEDBACK_STEERANGLE_ID,
-                     CANARD_TRANSFER_PRIORITY_LOW,
-                     &buffer[0],
-                     total_size);
+    canard_broadcast(UAVCAN_EQUIPMENT_AIR_DATA_RAWAIRDATA_SIGNATURE,
+                    UAVCAN_EQUIPMENT_AIR_DATA_RAWAIRDATA_ID,
+                    CANARD_TRANSFER_PRIORITY_LOW,
+                    &buffer[0],
+                    total_size);
+
+    // ardupilot_equipment_feedback_SteerAngle pkt {};
+
+    // pkt.steer_angle = swivel.get_angle();
+
+    // uint8_t buffer[ARDUPILOT_EQUIPMENT_FEEDBACK_STEERANGLE_MAX_SIZE] {};
+    // uint16_t total_size = ardupilot_equipment_feedback_SteerAngle_encode(&pkt, buffer, !periph.canfdout());
+
+    // canard_broadcast(ARDUPILOT_EQUIPMENT_FEEDBACK_STEERANGLE_SIGNATURE,
+    //                  ARDUPILOT_EQUIPMENT_FEEDBACK_STEERANGLE_ID,
+    //                  CANARD_TRANSFER_PRIORITY_LOW,
+    //                  &buffer[0],
+    //                  total_size);
 }
 
 
