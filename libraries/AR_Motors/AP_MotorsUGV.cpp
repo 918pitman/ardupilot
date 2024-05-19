@@ -17,6 +17,7 @@
 #include <GCS_MAVLink/GCS.h>
 #include "AP_MotorsUGV.h"
 #include <AP_Relay/AP_Relay.h>
+#include <AP_RSSI/AP_RSSI.h>
 
 #define SERVO_MAX 4500  // This value represents 45 degrees and is just an arbitrary representation of servo max travel.
 
@@ -525,6 +526,10 @@ bool AP_MotorsUGV::pre_arm_check(bool report) const
             return false;
         }
     }
+
+    AP_RSSI *rssi = AP::rssi();
+    float measurement = rssi->read_receiver_rssi();
+    GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "Measurement from Motors lib: %f", measurement*3.3);
 
     // Check relays are configured for brushed with relay outputs
 #if AP_RELAY_ENABLED
