@@ -130,7 +130,10 @@ void AP_RSSI::init()
     // is to take the 0 to 1024 range down to an 8 bit range for MAVLink    
     rssi_analog_source = hal.analogin->channel(ANALOG_INPUT_NONE);    
 }
-
+void AP_RSSI::update(void)
+{
+    GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "Measurement from Scheduler: %f", _measurement*3.3);
+}
 // Read the receiver RSSI value as a float 0.0f - 1.0f.
 // 0.0 represents weakest signal, 1.0 represents maximum signal.
 float AP_RSSI::read_receiver_rssi()
@@ -185,7 +188,8 @@ float AP_RSSI::read_pin_rssi()
     }
     float current_analog_voltage = rssi_analog_source->voltage_average();
 
-    return scale_and_constrain_float_rssi(current_analog_voltage, rssi_analog_pin_range_low, rssi_analog_pin_range_high);
+    _measurement = scale_and_constrain_float_rssi(current_analog_voltage, rssi_analog_pin_range_low, rssi_analog_pin_range_high);
+    return _measurement
 }
 
 // read the RSSI value from a PWM value on a RC channel

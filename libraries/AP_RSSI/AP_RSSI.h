@@ -47,6 +47,7 @@ public:
     // Initialize the rssi object and prepare it for use
     void init();
 
+    void update(void);
     // return true if rssi reading is enabled
     bool enabled() const { return RssiType(rssi_type.get()) != RssiType::TYPE_DISABLED; }
 
@@ -57,7 +58,7 @@ public:
     // Read the receiver RSSI value as an 8-bit integer
     // 0 represents weakest signal, 255 represents maximum signal.
     uint8_t read_receiver_rssi_uint8();   
-
+    float _measurement;
     // parameter block
     static const struct AP_Param::GroupInfo var_info[];
 
