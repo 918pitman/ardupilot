@@ -46,7 +46,7 @@ public:
 
     // Initialize the rssi object and prepare it for use
     void init();
-
+    void update(void);
     // return true if rssi reading is enabled
     bool enabled() const { return RssiType(rssi_type.get()) != RssiType::TYPE_DISABLED; }
 
@@ -73,7 +73,7 @@ private:
     AP_Int8         rssi_channel;                           // allows rssi to be read from given channel as PWM value
     AP_Int16        rssi_channel_low_pwm_value;             // PWM value for weakest rssi signal
     AP_Int16        rssi_channel_high_pwm_value;            // PWM value for strongest rssi signal
-
+    float           _reading;
     // Analog Inputs
     // a pin for reading the receiver RSSI voltage. 
     AP_HAL::AnalogSource *rssi_analog_source;

@@ -131,31 +131,37 @@ void AP_RSSI::init()
     rssi_analog_source = hal.analogin->channel(ANALOG_INPUT_NONE);    
 }
 
+
+void AP_RSSI::update(void)
+{
+    switch (RssiType(rssi_type.get())) {
+        case RssiType::TYPE_DISABLED:
+            _reading = 0.0f;
+        case RssiType::ANALOG_PIN:
+            _reading = read_pin_rssi();
+        case RssiType::RC_CHANNEL_VALUE:
+            _reading = read_channel_rssi();
+        case RssiType::RECEIVER: {
+            int16_t rssi = RC_Channels::get_receiver_rssi();
+            if (rssi != -1) {
+                _reading = rssi * (1/255.0);
+            }
+            _reading = 0.0f;
+        }
+        case RssiType::PWM_PIN:
+            _reading = read_pwm_pin_rssi();
+        case RssiType::TELEMETRY_RADIO_RSSI:
+            _reading = read_telemetry_radio_rssi();
+    }
+    // should never get to here
+    _reading = 0.0f;
+}
+
 // Read the receiver RSSI value as a float 0.0f - 1.0f.
 // 0.0 represents weakest signal, 1.0 represents maximum signal.
 float AP_RSSI::read_receiver_rssi()
 {
-    switch (RssiType(rssi_type.get())) {
-        case RssiType::TYPE_DISABLED:
-            return 0.0f;
-        case RssiType::ANALOG_PIN:
-            return read_pin_rssi();
-        case RssiType::RC_CHANNEL_VALUE:
-            return read_channel_rssi();
-        case RssiType::RECEIVER: {
-            int16_t rssi = RC_Channels::get_receiver_rssi();
-            if (rssi != -1) {
-                return rssi * (1/255.0);
-            }
-            return 0.0f;
-        }
-        case RssiType::PWM_PIN:
-            return read_pwm_pin_rssi();
-        case RssiType::TELEMETRY_RADIO_RSSI:
-            return read_telemetry_radio_rssi();
-    }
-    // should never get to here
-    return 0.0f;
+    return _reading;
 }
 
 // Only valid for RECEIVER type RSSI selections. Returns -1 if protocol does not provide link quality report.
@@ -183,9 +189,9 @@ float AP_RSSI::read_pin_rssi()
     if (!rssi_analog_source || !rssi_analog_source->set_pin(rssi_analog_pin)) {
         return 0;
     }
-    float current_analog_voltage = rssi_analog_source->voltage_average();
+    float current_analog_voltage = rssi_analog_source->read_latest();
 
-    return scale_and_constrain_float_rssi(current_analog_voltage, rssi_analog_pin_range_low, rssi_analog_pin_range_high);
+    return scale_and_constrain_float_rssi(current_analog_voltage*10, rssi_analog_pin_range_low, rssi_analog_pin_range_high);
 }
 
 // read the RSSI value from a PWM value on a RC channel
