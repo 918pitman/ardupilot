@@ -27,7 +27,7 @@ const AP_Param::GroupInfo AP_SWIVEL::var_info[] = {
     // @Description: Pin used to read the SWIVEL voltage
     // @Values: 8:V5 Nano,11:Pixracer,13:Pixhawk ADC4,14:Pixhawk ADC3,15:Pixhawk ADC6/Pixhawk2 ADC,50:AUX1,51:AUX2,52:AUX3,53:AUX4,54:AUX5,55:AUX6,103:Pixhawk SBUS
     // @User: Standard
-    AP_GROUPINFO("ANA_PIN", 1, AP_SWIVEL, swivel_analog_pin,  8),
+    AP_GROUPINFO("PIN", 1, AP_SWIVEL, swivel_analog_pin,  8),
 
     AP_GROUPEND
 };
@@ -68,7 +68,6 @@ void AP_SWIVEL::update(void)
         _measurement = 0.0f;
     }
     _measurement = swivel_analog_source->voltage_average();
-    //GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "Measurement from Scheduler: %f", _measurement*3.3);
 }
 
 float AP_SWIVEL::get_angle()
