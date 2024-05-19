@@ -24,7 +24,7 @@
 
 class AP_RSSI
 {
-
+public:
     AP_RSSI();
 
     /* Do not allow copies */
