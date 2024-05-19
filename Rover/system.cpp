@@ -42,10 +42,6 @@ void Rover::init_ardupilot()
 
     rssi.init();
 
-#if AP_SWIVEL_ENABLED
-    swivel.init();
-#endif
-
     g2.windvane.init(serial_manager);
 
     // init baro before we start the GCS, so that the CLI baro test works
@@ -82,6 +78,10 @@ void Rover::init_ardupilot()
 #if AP_BEACON_ENABLED
     // init beacons used for non-gps position estimation
     g2.beacon.init();
+#endif
+
+#if AP_SWIVEL_ENABLED
+    g2.swivel.init()
 #endif
 
     // and baro for EKF
