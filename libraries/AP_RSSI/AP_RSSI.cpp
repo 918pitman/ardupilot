@@ -137,29 +137,24 @@ void AP_RSSI::update(void)
     switch (RssiType(rssi_type.get())) {
         case RssiType::TYPE_DISABLED:
             _reading = 0.0f;
-            break;
         case RssiType::ANALOG_PIN:
             _reading = read_pin_rssi();
-            break;
         case RssiType::RC_CHANNEL_VALUE:
             _reading = read_channel_rssi();
-            break;
         case RssiType::RECEIVER: {
             int16_t rssi = RC_Channels::get_receiver_rssi();
             if (rssi != -1) {
                 _reading = rssi * (1/255.0);
-                break;
             }
             _reading = 0.0f;
-            break;
         }
         case RssiType::PWM_PIN:
             _reading = read_pwm_pin_rssi();
-            break;
         case RssiType::TELEMETRY_RADIO_RSSI:
             _reading = read_telemetry_radio_rssi();
-            break;
     }
+    // should never get to here
+    _reading = 0.0f;
 }
 
 // Read the receiver RSSI value as a float 0.0f - 1.0f.
