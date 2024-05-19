@@ -24,15 +24,6 @@
 
 class AP_RSSI
 {
-public:
-    enum class RssiType {
-        TYPE_DISABLED      = 0,
-        ANALOG_PIN         = 1,
-        RC_CHANNEL_VALUE   = 2,
-        RECEIVER           = 3,
-        PWM_PIN            = 4,
-        TELEMETRY_RADIO_RSSI = 5,
-    };
 
     AP_RSSI();
 
@@ -49,7 +40,7 @@ public:
 
     void update(void);
     // return true if rssi reading is enabled
-    bool enabled() const { return RssiType(rssi_type.get()) != RssiType::TYPE_DISABLED; }
+    bool enabled() const { return true; }
 
     // Read the receiver RSSI value as a float 0.0f - 1.0f.
     // 0.0 represents weakest signal, 1.0 represents maximum signal.
@@ -66,14 +57,7 @@ private:
 
     static AP_RSSI *_singleton;
 
-    // RSSI parameters
-    AP_Int8         rssi_type;                              // Type of RSSI being used
     AP_Int8         rssi_analog_pin;                        // Analog pin RSSI value found on
-    AP_Float        rssi_analog_pin_range_low;              // Voltage value for weakest rssi signal
-    AP_Float        rssi_analog_pin_range_high;             // Voltage value for strongest rssi signal
-    AP_Int8         rssi_channel;                           // allows rssi to be read from given channel as PWM value
-    AP_Int16        rssi_channel_low_pwm_value;             // PWM value for weakest rssi signal
-    AP_Int16        rssi_channel_high_pwm_value;            // PWM value for strongest rssi signal
 
     // Analog Inputs
     // a pin for reading the receiver RSSI voltage. 
