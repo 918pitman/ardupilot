@@ -21,53 +21,20 @@ void AP_Periph_FW::can_swivel_update()
     }
     last_update_ms = now;
     swivel.update();
-    AP_Proximity::Status status = proximity.get_status();
-    if (status <= AP_Proximity::Status::NoData) {
-        // don't send any data
-        return;
-    }
 
     ardupilot_equipment_feedback_SteerAngle pkt {};
 
-    const uint8_t obstacle_count = proximity.get_obstacle_count();
+    pkt.steer_angle = swivel.get_angle();
 
-    // if no objects return
-    if (obstacle_count == 0) {
-        return;
-    }
+    uint8_t buffer[ARDUPILOT_EQUIPMENT_FEEDBACK_STEERANGLE_MAX_SIZE] {};
+    uint16_t total_size = ardupilot_equipment_feedback_SteerAngle_encode(&pkt, buffer, !periph.canfdout());
 
-    // calculate maximum roll, pitch values from objects
-    for (uint8_t i=0; i<obstacle_count; i++) {
-        if (!proximity.get_obstacle_info(i, pkt.yaw, pkt.pitch, pkt.distance)) {
-            // not a valid obstacle
-            continue;
-        }
-
-        pkt.sensor_id = proximity.get_address(0);
-
-        switch (status) {
-        case AP_Proximity::Status::NotConnected:
-            pkt.reading_type = ARDUPILOT_EQUIPMENT_PROXIMITY_SENSOR_PROXIMITY_READING_TYPE_NOT_CONNECTED;
-            break;
-        case AP_Proximity::Status::Good:
-            pkt.reading_type = ARDUPILOT_EQUIPMENT_PROXIMITY_SENSOR_PROXIMITY_READING_TYPE_GOOD;
-            break;
-        case AP_Proximity::Status::NoData:
-        default:
-            pkt.reading_type = ARDUPILOT_EQUIPMENT_PROXIMITY_SENSOR_PROXIMITY_READING_TYPE_NO_DATA;
-            break;
-        }
-
-        uint8_t buffer[ARDUPILOT_EQUIPMENT_PROXIMITY_SENSOR_PROXIMITY_MAX_SIZE] {};
-        uint16_t total_size = ardupilot_equipment_proximity_sensor_Proximity_encode(&pkt, buffer, !periph.canfdout());
-
-        canard_broadcast(ARDUPILOT_EQUIPMENT_PROXIMITY_SENSOR_PROXIMITY_SIGNATURE,
-                        ARDUPILOT_EQUIPMENT_PROXIMITY_SENSOR_PROXIMITY_ID,
-                        CANARD_TRANSFER_PRIORITY_LOW,
-                        &buffer[0],
-                        total_size);
-
-    }
+    canard_broadcast(ARDUPILOT_EQUIPMENT_FEEDBACK_STEERANGLE_SIGNATURE,
+                     ARDUPILOT_EQUIPMENT_FEEDBACK_STEERANGLE_ID,
+                     CANARD_TRANSFER_PRIORITY_LOW,
+                     &buffer[0],
+                     total_size);
 }
+
 
 #endif // HAL_PERIPH_ENABLE_PROXIMITY
