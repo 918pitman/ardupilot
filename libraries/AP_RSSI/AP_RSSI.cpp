@@ -189,7 +189,7 @@ float AP_RSSI::read_pin_rssi()
     float current_analog_voltage = rssi_analog_source->voltage_average();
 
     _measurement = scale_and_constrain_float_rssi(current_analog_voltage, rssi_analog_pin_range_low, rssi_analog_pin_range_high);
-    return _measurement
+    return _measurement;
 }
 
 // read the RSSI value from a PWM value on a RC channel
