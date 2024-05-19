@@ -13,6 +13,7 @@
 #include <AP_Airspeed/AP_Airspeed.h>
 #include <AP_RangeFinder/AP_RangeFinder.h>
 #include <AP_Proximity/AP_Proximity.h>
+#include <AP_SWIVEL/AP_SWIVEL.h>
 #include <AP_EFI/AP_EFI.h>
 #include <AP_KDECAN/AP_KDECAN.h>
 #include <AP_MSP/AP_MSP.h>
@@ -166,6 +167,7 @@ public:
     void can_battery_update();
     void can_battery_send_cells(uint8_t instance);
     void can_proximity_update();
+    void can_swivel_update();
     void can_buzzer_update(void);
     void can_safety_button_update(void);
     void can_safety_LED_update(void);
@@ -278,6 +280,10 @@ public:
 
 #ifdef HAL_PERIPH_ENABLE_PROXIMITY
     AP_Proximity proximity;
+#endif
+
+#ifdef HAL_PERIPH_ENABLE_SWIVEL
+    AP_SWIVEL swivel;
 #endif
 
 #ifdef HAL_PERIPH_ENABLE_PWM_HARDPOINT

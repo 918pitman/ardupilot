@@ -528,7 +528,7 @@ bool AP_MotorsUGV::pre_arm_check(bool report) const
     }
 
     AP_SWIVEL *swivel = AP::swivel();
-    float measurement = swivel->read_receiver_swivel();
+    float measurement = swivel->get_angle();
     GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "Measurement from Motors lib: %f", measurement*3.3);
 
     // Check relays are configured for brushed with relay outputs
