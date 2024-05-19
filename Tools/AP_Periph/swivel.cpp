@@ -28,7 +28,7 @@ void AP_Periph_FW::can_swivel_update()
     pkt.position = swivel.get_angle();
     pkt.force = NAN;
     pkt.speed = NAN;
-    pkt.power_rating_pct = POWER_RATING_PCT_UNKNOWN;
+    pkt.power_rating_pct = 127;
 
     uint8_t buffer[UAVCAN_EQUIPMENT_ACTUATOR_STATUS_MAX_SIZE] {};
     uint16_t total_size = uavcan_equipment_actuator_Status_encode(&pkt, buffer, !periph.canfdout());
