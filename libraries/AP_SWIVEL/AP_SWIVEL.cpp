@@ -6,6 +6,10 @@
 #include "AP_SWIVEL_Analog.h"
 #include "AP_SWIVEL_DroneCAN.h"
 
+#ifndef BOARD_SWIVEL_DEFAULT
+#define BOARD_SWIVEL_DEFAULT 0
+#endif
+
 const AP_Param::GroupInfo AP_SWIVEL::var_info[] = {
     // @Param: TYPE
     // @DisplayName: SWIVEL Type
