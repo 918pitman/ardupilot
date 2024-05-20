@@ -3,7 +3,7 @@
 #include "AP_SWIVEL_config.h"
 
 #if AP_SWIVEL_ENABLED
-
+#include <AP_HAL/AP_HAL.h>
 #include <AP_Param/AP_Param.h>
 
 class AP_SWIVEL_Backend;
@@ -11,6 +11,8 @@ class AP_SWIVEL_Backend;
 class AP_SWIVEL
 {
     friend class AP_SWIVEL_Backend;
+    friend class AP_SWIVEL_Analog;
+    friend class AP_SWIVEL_DroneCAN;
 
 public:
     AP_SWIVEL();
@@ -18,7 +20,7 @@ public:
     CLASS_NO_COPY(AP_SWIVEL);  /* Do not allow copies */
 
     // SWIVEL driver types
-    enum Type {
+    enum class Type {
         NONE     = 0,
         ANALOG   = 1,
         DRONECAN = 2,
@@ -48,6 +50,7 @@ public:
 
 private:
 
+    HAL_Semaphore sem;
     AP_SWIVEL_Backend *driver;
 
     AP_Int8 swivel_type;

@@ -31,15 +31,15 @@ void AP_SWIVEL_DroneCAN::subscribe_msgs(AP_DroneCAN* ap_dronecan)
 void AP_SWIVEL_DroneCAN::handle_actuator(AP_DroneCAN *ap_dronecan, const CanardRxTransfer& transfer, const uavcan_equipment_actuator_Status &msg)
 {
     WITH_SEMAPHORE(_driver_sem);
-    _driver->last_reading_ms = AP_HAL::millis();
-    _driver->angle = msg.position;
+    _driver->_last_reading_ms = AP_HAL::millis();
+    _driver->_angle = msg.position;
 }
 
 void AP_SWIVEL_DroneCAN::update(void)
 {
     WITH_SEMAPHORE(_driver_sem);
-    state.last_reading_ms = last_reading_ms;
-    state.angle = angle;
+    state.last_reading_ms = _last_reading_ms;
+    state.angle = _angle;
 }
 
 #endif // AP_SWIVEL_DRONECAN_ENABLED

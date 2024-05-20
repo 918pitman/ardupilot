@@ -42,13 +42,13 @@ AP_SWIVEL::AP_SWIVEL(void)
  */
 void AP_SWIVEL::init(void)
 {
-    switch (swivel_type.get()) {
-    case NONE:
+    switch (Type(swivel_type.get())) {
+    case Type::NONE:
         break;
-    case ANALOG:
+    case Type::ANALOG:
         driver = new AP_SWIVEL_Analog(*this, state);
         break;
-    case DRONECAN:
+    case Type::DRONECAN:
         driver = new AP_SWIVEL_DroneCAN(*this, state);
         break;
 
@@ -57,6 +57,7 @@ void AP_SWIVEL::init(void)
 
 void AP_SWIVEL::update(void)
 {
+    WITH_SEMAPHORE(sem)
     if (driver != nullptr)
     {
         driver->update();

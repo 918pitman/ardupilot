@@ -24,8 +24,8 @@ private:
     static void handle_actuator(AP_DroneCAN *ap_dronecan, const CanardRxTransfer& transfer, const uavcan_equipment_actuator_Status &msg);
 
     // Temporay variables used to update main state in update call
-    float angle;
-    uint32_t last_reading_ms;
+    float _angle;
+    uint32_t _last_reading_ms;
     static AP_SWIVEL_DroneCAN *_driver;
     static HAL_Semaphore _driver_sem;
 
