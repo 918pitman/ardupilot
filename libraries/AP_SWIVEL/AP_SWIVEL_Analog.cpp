@@ -24,7 +24,7 @@ void AP_SWIVEL_Analog::update(void)
     if (AP_HAL::millis() - state.last_reading_ms > 1000) {
         state.angle = 0;
     }
-    state.angle = swivel_analog_source->voltage_average();
+    state.angle = source->voltage_average();
 }
 
 #endif  // AP_SWIVEL_PIN_ENABLED
