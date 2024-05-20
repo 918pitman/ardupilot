@@ -57,7 +57,6 @@ void AP_SWIVEL::init(void)
 
 void AP_SWIVEL::update(void)
 {
-    WITH_SEMAPHORE(sem);
     if (driver != nullptr)
     {
         driver->update();

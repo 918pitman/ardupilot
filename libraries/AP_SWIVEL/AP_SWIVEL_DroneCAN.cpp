@@ -37,7 +37,7 @@ void AP_SWIVEL_DroneCAN::handle_actuator(AP_DroneCAN *ap_dronecan, const CanardR
 
 void AP_SWIVEL_DroneCAN::update(void)
 {
-    WITH_SEMAPHORE(_driver_sem);
+    WITH_SEMAPHORE(sem);
     state.last_reading_ms = _last_reading_ms;
     state.angle = _angle;
 }

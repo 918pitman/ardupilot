@@ -3,9 +3,6 @@
 #if AP_SWIVEL_PIN_ENABLED
 
 #include "AP_SWIVEL_Analog.h"
-#include <AP_HAL/AP_HAL.h>
-#include <GCS_MAVLink/GCS.h>
-#include <AP_Math/AP_Math.h>
 
 extern const AP_HAL::HAL& hal;
 
@@ -17,6 +14,7 @@ AP_SWIVEL_Analog::AP_SWIVEL_Analog(AP_SWIVEL &_ap_swivel, AP_SWIVEL::SWIVEL_Stat
 
 void AP_SWIVEL_Analog::update(void)
 {
+    WITH_SEMAPHORE(sem);
     if (!source || !source->set_pin(get_pin())) {
         state.angle = 0;
     }
