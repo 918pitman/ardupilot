@@ -18,12 +18,6 @@
 #if AP_RPM_ENABLED
 
 #include "RPM_Backend.h"
-#include "RPM_Pin.h"
-#include "RPM_SITL.h"
-#include "RPM_EFI.h"
-#include "RPM_Generator.h"
-#include "RPM_HarmonicNotch.h"
-#include "RPM_ESC_Telem.h"
 #include "RPM_DroneCAN.h"
 
 #include <AP_Logger/AP_Logger.h>
@@ -71,45 +65,11 @@ void AP_RPM::init(void)
 
     for (uint8_t i=0; i<RPM_MAX_INSTANCES; i++) {
         switch (_params[i].type) {
-#if AP_RPM_PIN_ENABLED
-        case RPM_TYPE_PWM:
-        case RPM_TYPE_PIN:
-            // PWM option same as PIN option, for upgrade
-            drivers[i] = new AP_RPM_Pin(*this, i, state[i]);
-            break;
-#endif  // AP_RPM_PIN_ENABLED
-#if AP_RPM_ESC_TELEM_ENABLED
-        case RPM_TYPE_ESC_TELEM:
-            drivers[i] = new AP_RPM_ESC_Telem(*this, i, state[i]);
-            break;
-#endif  // AP_RPM_ESC_TELEM_ENABLED
-#if AP_RPM_EFI_ENABLED
-        case RPM_TYPE_EFI:
-            drivers[i] = new AP_RPM_EFI(*this, i, state[i]);
-            break;
-#endif  // AP_RPM_EFI_ENABLED
-#if AP_RPM_GENERATOR_ENABLED
-        case RPM_TYPE_GENERATOR:
-            drivers[i] = new AP_RPM_Generator(*this, i, state[i]);
-            break;
-#endif  // AP_RPM_GENERATOR_ENABLED
-#if AP_RPM_HARMONICNOTCH_ENABLED
-        // include harmonic notch last
-        // this makes whatever process is driving the dynamic notch appear as an RPM value
-        case RPM_TYPE_HNTCH:
-            drivers[i] = new AP_RPM_HarmonicNotch(*this, i, state[i]);
-            break;
-#endif  // AP_RPM_HARMONICNOTCH_ENABLED
 #if AP_RPM_DRONECAN_ENABLED
         case RPM_TYPE_DRONECAN:
             drivers[i] = new AP_RPM_DroneCAN(*this, i, state[i]);
             break;
 #endif // AP_RPM_DRONECAN_ENABLED
-#if AP_RPM_SIM_ENABLED
-        case RPM_TYPE_SITL:
-            drivers[i] = new AP_RPM_SITL(*this, i, state[i]);
-            break;
-#endif  // AP_RPM_SIM_ENABLED
         }
         if (drivers[i] != nullptr) {
             // we loaded a driver for this instance, so it must be
@@ -206,18 +166,8 @@ void AP_RPM::update(void)
             }
 
             drivers[i]->update();
-
-#if AP_RPM_ESC_TELEM_OUTBOUND_ENABLED
-            drivers[i]->update_esc_telem_outbound();
-#endif
         }
     }
-
-#if HAL_LOGGING_ENABLED
-    if (enabled(0) || enabled(1)) {
-        Log_RPM();
-    }
-#endif
 }
 
 /*
@@ -291,24 +241,6 @@ bool AP_RPM::arming_checks(size_t buflen, char *buffer) const
     }
     return true;
 }
-
-#if HAL_LOGGING_ENABLED
-void AP_RPM::Log_RPM() const
-{
-    float rpm1 = -1, rpm2 = -1;
-
-    get_rpm(0, rpm1);
-    get_rpm(1, rpm2);
-
-    const struct log_RPM pkt{
-        LOG_PACKET_HEADER_INIT(LOG_RPM_MSG),
-        time_us     : AP_HAL::micros64(),
-        rpm1        : rpm1,
-        rpm2        : rpm2
-    };
-    AP::logger().WriteBlock(&pkt, sizeof(pkt));
-}
-#endif
 
 #ifdef HAL_PERIPH_ENABLE_RPM_STREAM
 // Return the sensor id to use for streaming over DroneCAN, negative number disables
