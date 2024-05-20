@@ -70,6 +70,10 @@ void Rover::init_ardupilot()
     rangefinder.set_log_rfnd_bit(MASK_LOG_RANGEFINDER);
     rangefinder.init(ROTATION_NONE);
 
+#if AP_SWIVEL_ENABLED
+    g2.swivel.init();
+#endif
+
 #if HAL_PROXIMITY_ENABLED
     // init proximity sensor
     g2.proximity.init();
@@ -79,10 +83,6 @@ void Rover::init_ardupilot()
     // init beacons used for non-gps position estimation
     g2.beacon.init();
 #endif
-
-// #if AP_SWIVEL_ENABLED
-//     g2.swivel.init();
-// #endif
 
     // and baro for EKF
     barometer.set_log_baro_bit(MASK_LOG_IMU);

@@ -757,6 +757,9 @@ ParametersG2::ParametersG2(void)
 #if MODE_DOCK_ENABLED == ENABLED
     mode_dock_ptr(&rover.mode_dock),
 #endif
+#if AP_SWIVEL_ENABLED
+    swivel(),
+#endif
 #if HAL_PROXIMITY_ENABLED
     proximity(),
 #endif
