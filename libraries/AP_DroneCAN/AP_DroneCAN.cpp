@@ -61,6 +61,8 @@
 
 extern const AP_HAL::HAL& hal;
 
+#include <AP_RPM/RPM_DroneCAN.h>
+
 // setup default pool size
 #ifndef DRONECAN_NODE_POOL_SIZE
 #if HAL_CANFD_SUPPORTED
@@ -390,6 +392,9 @@ void AP_DroneCAN::init(uint8_t driver_index, bool enable_filters)
 #endif
 #if HAL_MOUNT_XACTI_ENABLED
     AP_Mount_Xacti::subscribe_msgs(this);
+#endif
+#if AP_RPM_DRONECAN_ENABLED
+    AP_RPM_DroneCAN::subscribe_msgs(this);
 #endif
 
     act_out_array.set_timeout_ms(5);
