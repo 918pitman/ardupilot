@@ -1,18 +1,10 @@
-#include "AP_SWIVEL_config.h"
+#include "AP_SWIVEL.h"
 
 #if AP_SWIVEL_ENABLED
 
-#include <AP_SWIVEL/AP_SWIVEL.h>
-#include <GCS_MAVLink/GCS.h>
-#include <RC_Channel/RC_Channel.h>
-
-#include <utility>
-
-extern const AP_HAL::HAL& hal;
-
-#ifndef BOARD_SWIVEL_DEFAULT
-#define BOARD_SWIVEL_DEFAULT 0
-#endif
+#include "AP_SWIVEL_Backend.h"
+#include "AP_SWIVEL_Analog.h"
+#include "AP_SWIVEL_DroneCAN.h"
 
 const AP_Param::GroupInfo AP_SWIVEL::var_info[] = {
     // @Param: TYPE
@@ -27,77 +19,59 @@ const AP_Param::GroupInfo AP_SWIVEL::var_info[] = {
     // @Description: Pin used to read the SWIVEL voltage
     // @Values: 8:V5 Nano,11:Pixracer,13:Pixhawk ADC4,14:Pixhawk ADC3,15:Pixhawk ADC6/Pixhawk2 ADC,50:AUX1,51:AUX2,52:AUX3,53:AUX4,54:AUX5,55:AUX6,103:Pixhawk SBUS
     // @User: Standard
-    AP_GROUPINFO("PIN", 1, AP_SWIVEL, swivel_analog_pin,  8),
+    AP_GROUPINFO("PIN", 1, AP_SWIVEL, analog_pin,  8),
 
     AP_GROUPEND
 };
 
-// Public
-// ------
-
-// constructor
-AP_SWIVEL::AP_SWIVEL()
-{       
+AP_SWIVEL::AP_SWIVEL(void)
+{
     AP_Param::setup_object_defaults(this, var_info);
-    if (_singleton) {
-        AP_HAL::panic("Too many SWIVEL sensors");
+
+    if (_singleton != nullptr) {
+        AP_HAL::panic("AP_SWIVEL must be singleton");
     }
     _singleton = this;
 }
 
-// destructor
-AP_SWIVEL::~AP_SWIVEL(void){}
-
 /*
- * Get the AP_SWIVEL singleton
+  initialise the AP_SWIVEL class.
  */
-AP_SWIVEL *AP_SWIVEL::get_singleton()
+void AP_SWIVEL::init(void)
 {
-    return _singleton;
-}
+    switch (Type(swivel_type.get())) {
+    case Type::ANALOG:
+        driver = new AP_SWIVEL_Analog(*this, state);
+        break;
+    case Type::DRONECAN:
+        driver = new AP_SWIVEL_DroneCAN(*this, state);
+        break;
 
-void AP_SWIVEL::subscribe_msgs(AP_DroneCAN* ap_dronecan)
-{
-    if (ap_dronecan == nullptr) {
-        return;
-    }
-
-    if (Canard::allocate_sub_arg_callback(ap_dronecan, &handle_actuator, ap_dronecan->get_driver_index()) == nullptr) {
-        AP_BoardConfig::allocation_error("actuator_sub");
-    }
-}
-
-// Initialize the swivel object and prepare it for use
-void AP_SWIVEL::init()
-{
-    if (get_type() == Type::ANALOG)
-    {
-        swivel_analog_source = hal.analogin->channel(ANALOG_INPUT_NONE);    
     }
 }
 
 void AP_SWIVEL::update(void)
 {
-    if (get_type() == Type::ANALOG)
-    {
-        if (!swivel_analog_source || !swivel_analog_source->set_pin(swivel_analog_pin)) {
-            _measurement = 0.0f;
-        }
-        _measurement = swivel_analog_source->voltage_average();
-    }
+    driver->update();
 }
 
-float AP_SWIVEL::get_angle()
+bool AP_SWIVEL::healthy() const
 {
-    return _measurement;
+    return true;
 }
 
-void AP_SWIVEL::handle_actuator(AP_DroneCAN *ap_dronecan, const CanardRxTransfer& transfer, const uavcan_equipment_actuator_Status &msg)
+bool AP_SWIVEL::enabled() const
 {
-    _measurement = msg.position;
+    return true;
 }
 
-AP_SWIVEL *AP_SWIVEL::_singleton = nullptr;
+bool AP_SWIVEL::get_angle(float &angle) const
+{
+    angle = state.angle;
+    return true;
+}
+
+AP_SWIVEL *AP_SWIVEL::_singleton;
 
 namespace AP {
 
@@ -106,6 +80,6 @@ AP_SWIVEL *swivel()
     return AP_SWIVEL::get_singleton();
 }
 
-};
+}
 
 #endif  // AP_SWIVEL_ENABLED

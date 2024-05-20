@@ -4,50 +4,55 @@
 
 #if AP_SWIVEL_ENABLED
 
-#include <AP_HAL/AP_HAL.h>
 #include <AP_Param/AP_Param.h>
-#include <AP_Math/AP_Math.h>
-#include <AP_DroneCAN/AP_DroneCAN.h>
-#include <AP_BoardConfig/AP_BoardConfig.h>
+
+class AP_SWIVEL_Backend;
 
 class AP_SWIVEL
 {
-public:
-    enum class Type {
-        NONE        = 0,
-        ANALOG      = 1,
-        DRONECAN    = 2,
-    };
+    friend class AP_SWIVEL_Backend;
 
+public:
     AP_SWIVEL();
 
-    /* Do not allow copies */
-    CLASS_NO_COPY(AP_SWIVEL);
+    CLASS_NO_COPY(AP_SWIVEL);  /* Do not allow copies */
 
-    // destructor
-    ~AP_SWIVEL(void);
+    // SWIVEL driver types
+    enum class Type {
+        NONE     = 0,
+        ANALOG   = 1,
+        DRONECAN = 2,
+    };
 
-    static AP_SWIVEL *get_singleton();
+    // The SWIVEL_State structure is filled in by the backend driver
+    struct SWIVEL_State {
+        float                  angle;
+        uint32_t               last_reading_ms;
+    };
 
-    static void subscribe_msgs(AP_DroneCAN* ap_dronecan);
-
-    void init();
-    void update(void);
     Type get_type() const { return Type(swivel_type.get()); }
-    float get_angle();
-    float _measurement;
+
     static const struct AP_Param::GroupInfo var_info[];
 
+    void init(void);
+
+    void update(void);
+
+    bool get_angle(float &angle) const;
+
+    bool healthy() const;
+
+    bool enabled() const;
+
+    static AP_SWIVEL *get_singleton() { return _singleton; }
+
 private:
+
     static AP_SWIVEL *_singleton;
-
-    static void handle_actuator(AP_DroneCAN *ap_dronecan,
-                                const CanardRxTransfer& transfer,
-                                const uavcan_equipment_actuator_Status &msg);
-
-    AP_Int8         swivel_type;
-    AP_Int8         swivel_analog_pin;
-    AP_HAL::AnalogSource *swivel_analog_source;
+    AP_Int8 swivel_type;
+    AP_Int8 analog_pin;
+    SWIVEL_State state;
+    AP_SWIVEL_Backend *driver;
 };
 
 namespace AP {
