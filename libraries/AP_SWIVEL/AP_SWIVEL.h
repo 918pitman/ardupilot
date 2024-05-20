@@ -18,7 +18,7 @@ public:
     CLASS_NO_COPY(AP_SWIVEL);  /* Do not allow copies */
 
     // SWIVEL driver types
-    enum class Type {
+    enum Type {
         NONE     = 0,
         ANALOG   = 1,
         DRONECAN = 2,
@@ -48,11 +48,14 @@ public:
 
 private:
 
-    static AP_SWIVEL *_singleton;
+    AP_SWIVEL_Backend *driver;
+
     AP_Int8 swivel_type;
     AP_Int8 analog_pin;
+
     SWIVEL_State state;
-    AP_SWIVEL_Backend *driver;
+
+    static AP_SWIVEL *_singleton;
 };
 
 namespace AP {

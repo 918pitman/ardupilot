@@ -31,7 +31,6 @@ const AP_Param::GroupInfo AP_SWIVEL::var_info[] = {
 AP_SWIVEL::AP_SWIVEL(void)
 {
     AP_Param::setup_object_defaults(this, var_info);
-
     if (_singleton != nullptr) {
         AP_HAL::panic("AP_SWIVEL must be singleton");
     }
@@ -43,13 +42,13 @@ AP_SWIVEL::AP_SWIVEL(void)
  */
 void AP_SWIVEL::init(void)
 {
-    switch (Type(swivel_type.get())) {
-    case Type::NONE:
+    switch (swivel_type.get()) {
+    case NONE:
         break;
-    case Type::ANALOG:
+    case ANALOG:
         driver = new AP_SWIVEL_Analog(*this, state);
         break;
-    case Type::DRONECAN:
+    case DRONECAN:
         driver = new AP_SWIVEL_DroneCAN(*this, state);
         break;
 
@@ -58,23 +57,30 @@ void AP_SWIVEL::init(void)
 
 void AP_SWIVEL::update(void)
 {
-    driver->update();
+    if (driver != nullptr)
+    {
+        driver->update();
+    }
 }
 
 bool AP_SWIVEL::healthy() const
 {
-    return true;
+    return (driver != nullptr);
 }
 
 bool AP_SWIVEL::enabled() const
 {
-    return true;
+    return (driver != nullptr);
 }
 
 bool AP_SWIVEL::get_angle(float &angle) const
 {
-    angle = state.angle;
-    return true;
+    if (driver != nullptr)
+    {
+        angle = state.angle;
+        return true;
+    }
+    return false;
 }
 
 AP_SWIVEL *AP_SWIVEL::_singleton;
