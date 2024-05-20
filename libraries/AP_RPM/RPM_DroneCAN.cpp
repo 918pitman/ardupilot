@@ -46,7 +46,7 @@ void AP_RPM_DroneCAN::subscribe_msgs(AP_DroneCAN* ap_dronecan)
 }
 
 // Receive new CAN message
-void AP_RPM_DroneCAN::handle_rpm(AP_DroneCAN *ap_dronecan, const CanardRxTransfer& transfer, const dronecan_sensors_rpm_RPM &msg)
+void AP_RPM_DroneCAN::handle_rpm(AP_DroneCAN *ap_dronecan, const CanardRxTransfer& transfer, const uavcan_equipment_actuator_Status &msg)
 {
     WITH_SEMAPHORE(_driver_sem);
 
@@ -58,12 +58,12 @@ void AP_RPM_DroneCAN::handle_rpm(AP_DroneCAN *ap_dronecan, const CanardRxTransfe
         const uint8_t instance = _drivers[i]->state.instance;
         const AP_RPM_Params& params = _drivers[i]->ap_rpm._params[instance];
 
-        if (params.dronecan_sensor_id == msg.sensor_id) {
+        if (params.dronecan_sensor_id == msg.actuator_id) {
             // Driver loaded and looking for this ID, add reading
             _drivers[i]->last_reading_ms = AP_HAL::millis();
-            _drivers[i]->rpm = msg.rpm * params.scaling;
+            _drivers[i]->rpm = msg.position * params.scaling;
 
-            const bool heathy = (msg.flags & DRONECAN_SENSORS_RPM_RPM_FLAGS_UNHEALTHY) == 0;
+            const bool heathy = true;
             _drivers[i]->signal_quality = heathy ? 0.5 : 0.0;
         }
     }
