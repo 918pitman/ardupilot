@@ -35,7 +35,7 @@ public:
 private:
 
     // Receive new CAN message
-    static void handle_rpm(AP_DroneCAN *ap_dronecan, const CanardRxTransfer& transfer, const dronecan_sensors_rpm_RPM &msg);
+    static void handle_rpm(AP_DroneCAN *ap_dronecan, const CanardRxTransfer& transfer, const uavcan_equipment_actuator_Status &msg);
 
     // Temporay variables used to update main state in update call
     float rpm;
