@@ -56,45 +56,23 @@ AP_SWIVEL *AP_SWIVEL::get_singleton()
     return _singleton;
 }
 
-void AP_SWIVEL::subscribe_msgs(AP_DroneCAN* ap_dronecan)
-{
-    if (ap_dronecan == nullptr) {
-        return;
-    }
-
-    if (Canard::allocate_sub_arg_callback(ap_dronecan, &handle_actuator, ap_dronecan->get_driver_index()) == nullptr) {
-        AP_BoardConfig::allocation_error("actuator_sub");
-    }
-}
-
 // Initialize the swivel object and prepare it for use
 void AP_SWIVEL::init()
-{
-    if (get_type() == Type::ANALOG)
-    {
-        swivel_analog_source = hal.analogin->channel(ANALOG_INPUT_NONE);    
-    }
+{   
+    swivel_analog_source = hal.analogin->channel(ANALOG_INPUT_NONE);    
 }
 
 void AP_SWIVEL::update(void)
 {
-    if (get_type() == Type::ANALOG)
-    {
-        if (!swivel_analog_source || !swivel_analog_source->set_pin(swivel_analog_pin)) {
-            _measurement = 0.0f;
-        }
-        _measurement = swivel_analog_source->voltage_average();
+    if (!swivel_analog_source || !swivel_analog_source->set_pin(swivel_analog_pin)) {
+        _measurement = 0.0f;
     }
+    _measurement = swivel_analog_source->voltage_average();
 }
 
 float AP_SWIVEL::get_angle()
 {
     return _measurement;
-}
-
-void AP_SWIVEL::handle_actuator(AP_DroneCAN *ap_dronecan, const CanardRxTransfer& transfer, const uavcan_equipment_actuator_Status &msg)
-{
-    _measurement = msg.position;
 }
 
 AP_SWIVEL *AP_SWIVEL::_singleton = nullptr;

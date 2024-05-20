@@ -7,8 +7,6 @@
 #include <AP_HAL/AP_HAL.h>
 #include <AP_Param/AP_Param.h>
 #include <AP_Math/AP_Math.h>
-#include <AP_DroneCAN/AP_DroneCAN.h>
-#include <AP_BoardConfig/AP_BoardConfig.h>
 
 class AP_SWIVEL
 {
@@ -18,7 +16,6 @@ public:
         ANALOG      = 1,
         DRONECAN    = 2,
     };
-
     AP_SWIVEL();
 
     /* Do not allow copies */
@@ -29,8 +26,6 @@ public:
 
     static AP_SWIVEL *get_singleton();
 
-    static void subscribe_msgs(AP_DroneCAN* ap_dronecan);
-
     void init();
     void update(void);
     Type get_type() const { return Type(swivel_type.get()); }
@@ -40,11 +35,6 @@ public:
 
 private:
     static AP_SWIVEL *_singleton;
-
-    static void handle_actuator(AP_DroneCAN *ap_dronecan,
-                                const CanardRxTransfer& transfer,
-                                const uavcan_equipment_actuator_Status &msg);
-
     AP_Int8         swivel_type;
     AP_Int8         swivel_analog_pin;
     AP_HAL::AnalogSource *swivel_analog_source;
