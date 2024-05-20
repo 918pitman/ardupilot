@@ -28,7 +28,7 @@ void AP_SWIVEL_DroneCAN::subscribe_msgs(AP_DroneCAN* ap_dronecan)
 }
 
 // Receive new CAN message
-void AP_SWIVEL_DroneCAN::handle_actuator(AP_DroneCAN *ap_dronecan, const CanardRxTransfer& transfer, const dronecan_sensors_swivel_SWIVEL &msg)
+void AP_SWIVEL_DroneCAN::handle_actuator(AP_DroneCAN *ap_dronecan, const CanardRxTransfer& transfer, const uavcan_equipment_actuator_Status &msg)
 {
     WITH_SEMAPHORE(_driver_sem);
     _driver->last_reading_ms = AP_HAL::millis();
