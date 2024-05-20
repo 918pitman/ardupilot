@@ -59,7 +59,7 @@
 #include <AP_Relay/AP_Relay.h>
 #endif
 
-#include <AP_SWIVEL/AP_SWIVEL.h>
+#include <AP_SWIVEL/AP_SWIVEL_DroneCAN.h>
 
 extern const AP_HAL::HAL& hal;
 
@@ -393,7 +393,7 @@ void AP_DroneCAN::init(uint8_t driver_index, bool enable_filters)
 #if HAL_MOUNT_XACTI_ENABLED
     AP_Mount_Xacti::subscribe_msgs(this);
 #endif
-    AP_SWIVEL::subscribe_msgs(this);
+    AP_SWIVEL_DroneCAN::subscribe_msgs(this);
 
     act_out_array.set_timeout_ms(5);
     act_out_array.set_priority(CANARD_TRANSFER_PRIORITY_HIGH);
