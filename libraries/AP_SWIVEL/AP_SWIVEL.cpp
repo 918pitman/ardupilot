@@ -44,6 +44,8 @@ AP_SWIVEL::AP_SWIVEL(void)
 void AP_SWIVEL::init(void)
 {
     switch (Type(swivel_type.get())) {
+    case Type::NONE:
+        break;
     case Type::ANALOG:
         driver = new AP_SWIVEL_Analog(*this, state);
         break;
