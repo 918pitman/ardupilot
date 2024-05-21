@@ -54,7 +54,7 @@ private:
 };
 
 namespace AP {
-    AP_SWIVEL *angle();
+    AP_SWIVEL *swivel();
 };
 
 #endif  // AP_SWIVEL_ENABLED
