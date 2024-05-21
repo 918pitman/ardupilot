@@ -31,12 +31,16 @@ void AP_SWIVEL::init(void)
     switch (get_type()) {
         case Type::NONE:
             return;
+#if AP_SWIVEL_PIN_ENABLED
         case Type::ANALOG:
             driver = new AP_SWIVEL_Analog(*this, state);
             break;
+#endif
+#if AP_SWIVEL_DRONECAN_ENABLED
         case Type::DRONECAN:
             driver = new AP_SWIVEL_DroneCAN(*this, state);
             break;
+#endif
     }
 }
 
