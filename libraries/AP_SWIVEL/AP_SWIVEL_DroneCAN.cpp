@@ -33,7 +33,6 @@ void AP_SWIVEL_DroneCAN::handle_angle(AP_DroneCAN *ap_dronecan, const CanardRxTr
     if (_driver == nullptr) {
         return;
     }
-    const AP_SWIVEL_Params& params = _driver->ap_swivel._params;
     _driver->last_reading_ms = AP_HAL::millis();
     _driver->angle = msg.position;
 }
