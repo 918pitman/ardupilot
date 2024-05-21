@@ -3,7 +3,6 @@
 #if AP_SWIVEL_ENABLED
 
 #include "AP_SWIVEL_Backend.h"
-#include "AP_SWIVEL_Analog.h"
 #include "AP_SWIVEL_DroneCAN.h"
 
 #ifndef BOARD_SWIVEL_DEFAULT
@@ -45,9 +44,6 @@ void AP_SWIVEL::init(void)
     switch (Type(swivel_type.get())) {
     case Type::NONE:
         break;
-    case Type::ANALOG:
-        driver = new AP_SWIVEL_Analog(*this, state);
-        break;
     case Type::DRONECAN:
         driver = new AP_SWIVEL_DroneCAN(*this, state);
         break;
@@ -57,7 +53,6 @@ void AP_SWIVEL::init(void)
 
 void AP_SWIVEL::update(void)
 {
-    WITH_SEMAPHORE(sem);
     if (driver != nullptr)
     {
         driver->update();

@@ -11,8 +11,6 @@ class AP_SWIVEL_Backend;
 class AP_SWIVEL
 {
     friend class AP_SWIVEL_Backend;
-    friend class AP_SWIVEL_Analog;
-    friend class AP_SWIVEL_DroneCAN;
 
 public:
     AP_SWIVEL();
