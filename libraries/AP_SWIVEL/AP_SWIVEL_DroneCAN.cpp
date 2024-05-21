@@ -21,13 +21,13 @@ void AP_SWIVEL_DroneCAN::subscribe_msgs(AP_DroneCAN* ap_dronecan)
         return;
     }
 
-    if (Canard::allocate_sub_arg_callback(ap_dronecan, &handle_swivel, ap_dronecan->get_driver_index()) == nullptr) {
+    if (Canard::allocate_sub_arg_callback(ap_dronecan, &handle_angle, ap_dronecan->get_driver_index()) == nullptr) {
         AP_BoardConfig::allocation_error("swivel_sub");
     }
 }
 
 // Receive new CAN message
-void AP_SWIVEL_DroneCAN::handle_swivel(AP_DroneCAN *ap_dronecan, const CanardRxTransfer& transfer, const uavcan_equipment_actuator_Status &msg)
+void AP_SWIVEL_DroneCAN::handle_angle(AP_DroneCAN *ap_dronecan, const CanardRxTransfer& transfer, const uavcan_equipment_actuator_Status &msg)
 {
     WITH_SEMAPHORE(_driver_sem);
     if (_driver == nullptr) {
