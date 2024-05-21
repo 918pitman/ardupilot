@@ -25,7 +25,7 @@ void AP_Periph_FW::can_swivel_update()
     uavcan_equipment_actuator_Status pkt {};
 
     pkt.actuator_id = 0;
-    pkt.position = swivel.get_angle();
+    swivel.get_angle(pkt.position);
     pkt.force = NAN;
     pkt.speed = NAN;
     pkt.power_rating_pct = 127;

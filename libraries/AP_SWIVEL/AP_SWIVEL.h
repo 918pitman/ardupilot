@@ -22,10 +22,10 @@ public:
 
     CLASS_NO_COPY(AP_SWIVEL);
 
-    enum SWIVEL_Type {
-        SWIVEL_TYPE_NONE     = 0,
-        SWIVEL_TYPE_ANALOG   = 1,
-        SWIVEL_TYPE_DRONECAN = 2,
+    enum class Type {
+        NONE     = 0,
+        ANALOG   = 1,
+        DRONECAN = 2,
     };
 
     struct SWIVEL_State {
@@ -39,6 +39,7 @@ public:
 
     void init(void);
     void update(void);
+    Type get_type() const { return (Type)((uint8_t)_params.type); }
     bool get_angle(float &angle_value) const;
     bool enabled() const;
 

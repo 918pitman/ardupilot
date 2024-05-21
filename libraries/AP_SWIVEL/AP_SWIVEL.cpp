@@ -28,13 +28,13 @@ AP_SWIVEL::AP_SWIVEL(void)
 
 void AP_SWIVEL::init(void)
 {
-    switch (_params.type) {
-        case SWIVEL_TYPE_NONE:
+    switch (get_type()) {
+        case Type::NONE:
             return;
-        case SWIVEL_TYPE_ANALOG:
+        case Type::ANALOG:
             driver = new AP_SWIVEL_Analog(*this, state);
             break;
-        case SWIVEL_TYPE_DRONECAN:
+        case Type::DRONECAN:
             driver = new AP_SWIVEL_DroneCAN(*this, state);
             break;
     }
@@ -49,7 +49,7 @@ void AP_SWIVEL::update(void)
 
 bool AP_SWIVEL::enabled() const
 {
-    return (_params.type != SWIVEL_TYPE_NONE);
+    return (get_type() != Type::NONE);
 }
 
 bool AP_SWIVEL::get_angle(float &angle_value) const
