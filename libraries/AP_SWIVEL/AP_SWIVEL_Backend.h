@@ -11,7 +11,6 @@ public:
     virtual void update() = 0;
 
 protected:
-    HAL_Semaphore sem;
     int8_t get_pin(void) const { return ap_swivel.analog_pin.get(); }
     AP_SWIVEL &ap_swivel;
     AP_SWIVEL::SWIVEL_State &state;

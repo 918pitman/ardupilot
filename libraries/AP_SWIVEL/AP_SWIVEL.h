@@ -50,6 +50,7 @@ public:
 
 private:
 
+    HAL_Semaphore sem;
     AP_SWIVEL_Backend *driver;
 
     AP_Int8 swivel_type;
