@@ -3,6 +3,7 @@
 #if AP_SWIVEL_ENABLED
 
 #include "AP_SWIVEL_Backend.h"
+#include "AP_SWIVEL_Analog.h"
 #include "AP_SWIVEL_DroneCAN.h"
 
 extern const AP_HAL::HAL& hal;
@@ -31,7 +32,8 @@ void AP_SWIVEL::init(void)
         case SWIVEL_TYPE_NONE:
             return;
         case SWIVEL_TYPE_ANALOG:
-            return;
+            driver = new AP_SWIVEL_Analog(*this, state);
+            break;
         case SWIVEL_TYPE_DRONECAN:
             driver = new AP_SWIVEL_DroneCAN(*this, state);
             break;
