@@ -141,7 +141,6 @@ const struct MultiplierStructure log_Multipliers[] = {
 #include <AP_ESC_Telem/LogStructure.h>
 #include <AP_AIS/LogStructure.h>
 #include <AP_HAL_ChibiOS/LogStructure.h>
-#include <AP_RPM/LogStructure.h>
 #include <AC_Fence/LogStructure.h>
 #include <AP_Landing/LogStructure.h>
 #include <AC_AttitudeControl/LogStructure.h>
@@ -1273,7 +1272,6 @@ LOG_STRUCTURE_FROM_NAVEKF \
 LOG_STRUCTURE_FROM_AHRS \
 LOG_STRUCTURE_FROM_HAL_CHIBIOS \
 LOG_STRUCTURE_FROM_HAL \
-LOG_STRUCTURE_FROM_RPM \
 LOG_STRUCTURE_FROM_FENCE \
     { LOG_DF_FILE_STATS, sizeof(log_DSF), \
       "DSF", "QIHIIII", "TimeUS,Dp,Blk,Bytes,FMn,FMx,FAv", "s--b---", "F--0---" }, \
@@ -1350,7 +1348,6 @@ enum LogMessages : uint8_t {
     LOG_IDS_FROM_LANDING,
     LOG_MAG_MSG,
     LOG_ARSP_MSG,
-    LOG_IDS_FROM_RPM,
     LOG_RFND_MSG,
     LOG_MAV_STATS,
     LOG_FORMAT_UNITS_MSG,
