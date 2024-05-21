@@ -20,7 +20,6 @@ public:
     // SWIVEL driver types
     enum class Type {
         NONE     = 0,
-        ANALOG   = 1,
         DRONECAN = 2,
     };
 
