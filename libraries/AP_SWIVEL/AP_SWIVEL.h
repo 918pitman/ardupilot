@@ -24,8 +24,12 @@ public:
 
     enum class Type {
         NONE     = 0,
+#if AP_SWIVEL_PIN_ENABLED
         ANALOG   = 1,
+#endif
+#if AP_SWIVEL_DRONECAN_ENABLED
         DRONECAN = 2,
+#endif
     };
 
     struct SWIVEL_State {
