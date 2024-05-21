@@ -10,22 +10,20 @@
 class AP_SWIVEL_DroneCAN : public AP_SWIVEL_Backend
 {
 public:
+
     AP_SWIVEL_DroneCAN(AP_SWIVEL &_ap_swivel, AP_SWIVEL::SWIVEL_State &_state);
 
-    // Subscribe to incoming swivel messages
     static void subscribe_msgs(AP_DroneCAN* ap_dronecan);
 
-    // update state
     void update(void) override;
 
 private:
 
-    // Receive new CAN message
-    static void handle_actuator(AP_DroneCAN *ap_dronecan, const CanardRxTransfer& transfer, const uavcan_equipment_actuator_Status &msg);
+    static void handle_angle(AP_DroneCAN *ap_dronecan, const CanardRxTransfer& transfer, const uavcan_equipment_actuator_Status &msg);
 
-    // Temporay variables used to update main state in update call
-    float _angle;
-    uint32_t _last_reading_ms;
+    float angle;
+    uint32_t last_reading_ms;
+
     static AP_SWIVEL_DroneCAN *_driver;
     static HAL_Semaphore _driver_sem;
 

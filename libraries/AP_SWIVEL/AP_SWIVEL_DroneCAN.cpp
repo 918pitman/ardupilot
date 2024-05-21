@@ -15,31 +15,37 @@ AP_SWIVEL_DroneCAN::AP_SWIVEL_DroneCAN(AP_SWIVEL &_ap_swivel, AP_SWIVEL::SWIVEL_
     _driver = this;
 }
 
-// Subscribe to incoming swivel messages
 void AP_SWIVEL_DroneCAN::subscribe_msgs(AP_DroneCAN* ap_dronecan)
 {
     if (ap_dronecan == nullptr) {
         return;
     }
 
-    if (Canard::allocate_sub_arg_callback(ap_dronecan, &handle_actuator, ap_dronecan->get_driver_index()) == nullptr) {
-        AP_BoardConfig::allocation_error("actuator_sub");
+    if (Canard::allocate_sub_arg_callback(ap_dronecan, &handle_swivel, ap_dronecan->get_driver_index()) == nullptr) {
+        AP_BoardConfig::allocation_error("swivel_sub");
     }
 }
 
 // Receive new CAN message
-void AP_SWIVEL_DroneCAN::handle_actuator(AP_DroneCAN *ap_dronecan, const CanardRxTransfer& transfer, const uavcan_equipment_actuator_Status &msg)
+void AP_SWIVEL_DroneCAN::handle_swivel(AP_DroneCAN *ap_dronecan, const CanardRxTransfer& transfer, const uavcan_equipment_actuator_Status &msg)
 {
     WITH_SEMAPHORE(_driver_sem);
-    _driver->_last_reading_ms = AP_HAL::millis();
-    _driver->_angle = msg.position;
+    if (_driver == nullptr) {
+        return;
+    }
+    const AP_SWIVEL_Params& params = _driver->ap_swivel._params;
+    _driver->last_reading_ms = AP_HAL::millis();
+    _driver->angle = msg.position;
 }
 
 void AP_SWIVEL_DroneCAN::update(void)
 {
     WITH_SEMAPHORE(_driver_sem);
-    state.last_reading_ms = _last_reading_ms;
-    state.angle = _angle;
+    state.last_reading_ms = last_reading_ms;
+    state.angle = angle;
+    if ((AP_HAL::millis() - state.last_reading_ms) > 1000) {
+        state.angle = 0;
+    }
 }
 
 #endif // AP_SWIVEL_DRONECAN_ENABLED
