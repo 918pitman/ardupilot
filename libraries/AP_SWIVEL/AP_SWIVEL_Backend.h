@@ -15,8 +15,8 @@ public:
     virtual void update() = 0;
 
     int8_t get_pin(void) const { return ap_swivel._params.pin.get(); }
-    float get_v_center(void) const { return ap_swivel._params.volt_min.get() + ((ap_swivel._params.volt_max.get() - ap_swivel._params.volt_min.get()) / 2); }
-    float get_v_per_radian(void) const {return (ap_swivel._params.volt_max.get() - ap_swivel._params.volt_min.get()) / M_PI; }
+    int8_t get_volt_min(void) const { return ap_swivel._params.volt_min.get(); }
+    int8_t get_volt_max(void) const { return ap_swivel._params.volt_max.get(); }
 
 protected:
 
