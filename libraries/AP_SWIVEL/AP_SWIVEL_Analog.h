@@ -17,11 +17,11 @@ public:
 private:
 
     AP_HAL::AnalogSource *source;
-    float volt_min;
-    float volt_max;
-    float volt_range;
-    float volt_center;
-    float volt_per_radian;
+    // float volt_min;
+    // float volt_max;
+    // float volt_range;
+    // float volt_center;
+    // float volt_per_radian;
 };
 
 #endif  // AP_SWIVEL_PIN_ENABLED
