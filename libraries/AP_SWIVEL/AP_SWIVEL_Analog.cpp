@@ -19,7 +19,7 @@ void AP_SWIVEL_Analog::update(void)
         state.angle = 0;
     }
     float voltage = source->voltage_average();
-    state.angle = (voltage - v_center) / v_per_radian;
+    state.angle = (voltage - get_v_center()) / get_v_per_radian();
     state.last_reading_ms = AP_HAL::millis();
 }
 
