@@ -16,14 +16,14 @@ const AP_Param::GroupInfo AP_SWIVEL_Params::var_info[] = {
     // @User: Standard
     AP_GROUPINFO("PIN", 2, AP_SWIVEL_Params, pin, 8),
 
-    // @Param: PIN
+    // @Param: VOLT_MIN
     // @DisplayName: Input pin number
     // @Description: Analog Pin to measure angle from
     // @Units: V
     // @User: Standard
     AP_GROUPINFO("VOLT_MIN", 3, AP_SWIVEL_Params, volt_min, 0.0f),
 
-    // @Param: PIN
+    // @Param: VOLT_MAX
     // @DisplayName: Input pin number
     // @Description: Analog Pin to measure angle from
     // @Units: V
