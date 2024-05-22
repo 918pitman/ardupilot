@@ -9,7 +9,7 @@ public:
     AP_SWIVEL_Params(void);
 
     AP_Int8  type;
-    AP_Int8  pin;
+    AP_Int8  volt_pin;
     AP_Float volt_min;
     AP_Float volt_max;
 

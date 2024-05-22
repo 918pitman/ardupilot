@@ -17,11 +17,13 @@ public:
 private:
 
     AP_HAL::AnalogSource *source;
-    // float volt_min;
-    // float volt_max;
-    // float volt_range;
-    // float volt_center;
-    // float volt_per_radian;
+    
+    int8_t volt_pin        = ap_swivel._params.volt_pin.get();
+    float  volt_min        = ap_swivel._params.volt_min.get();
+    float  volt_max        = ap_swivel._params.volt_max.get();
+    float  volt_range      = volt_max - volt_min;
+    float  volt_center     = volt_min + (volt_range / 2);
+    float  volt_per_radian = volt_range / M_PI;
 };
 
 #endif  // AP_SWIVEL_PIN_ENABLED
