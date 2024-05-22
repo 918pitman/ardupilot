@@ -10,6 +10,8 @@ public:
 
     AP_Int8  type;
     AP_Int8  pin;
+    AP_Int8  min;
+    AP_Int8  max;
 
     static const struct AP_Param::GroupInfo var_info[];
 

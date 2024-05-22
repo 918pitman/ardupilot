@@ -16,6 +16,20 @@ const AP_Param::GroupInfo AP_SWIVEL_Params::var_info[] = {
     // @User: Standard
     AP_GROUPINFO("PIN", 2, AP_SWIVEL_Params, pin, 8),
 
+    // @Param: MIN
+    // @DisplayName: Input pin number
+    // @Description: Analog Pin to measure angle from
+    // @Values: -1:Disabled,50:AUX1,51:AUX2,52:AUX3,53:AUX4,54:AUX5,55:AUX6
+    // @User: Standard
+    AP_GROUPINFO("MIN", 3, AP_SWIVEL_Params, min, 8),
+
+    // @Param: MAX
+    // @DisplayName: Input pin number
+    // @Description: Analog Pin to measure angle from
+    // @Values: -1:Disabled,50:AUX1,51:AUX2,52:AUX3,53:AUX4,54:AUX5,55:AUX6
+    // @User: Standard
+    AP_GROUPINFO("MAX", 3, AP_SWIVEL_Params, max, 8),
+
     AP_GROUPEND
 };
 
