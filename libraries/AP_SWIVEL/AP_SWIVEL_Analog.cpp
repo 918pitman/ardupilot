@@ -18,8 +18,9 @@ void AP_SWIVEL_Analog::update(void)
     if (!source || !source->set_pin(get_pin())) {
         state.angle = 0;
     }
+    float voltage = source->voltage_average();
+    state.angle = (voltage - v_center) / v_per_radian;
     state.last_reading_ms = AP_HAL::millis();
-    state.angle = source->voltage_average();
 }
 
 #endif  // AP_SWIVEL_PIN_ENABLED
