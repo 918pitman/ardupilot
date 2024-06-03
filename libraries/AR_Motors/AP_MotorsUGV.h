@@ -212,6 +212,10 @@ private:
     // internal variables
     float   _steering;  // requested steering as a value from -4500 to +4500
     float   _throttle;  // requested throttle as a value from -100 to 100
+    float   _swivel_steering;  // requested swivel steering as a value from -4500 to +4500
+    float   _swivel_throttle;  // requested swivel throttle as a value from -100 to 100
+    float   _swivel_angle;     // current angle of the swivel in radians
+    float   _swivel_error;     // current error of the swivel in radians
     float   _throttle_prev; // throttle input from previous iteration
     bool    _scale_steering = true; // true if we should scale steering by speed or angle
     float   _lateral;  // requested lateral input as a value from -100 to +100
