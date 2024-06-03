@@ -332,12 +332,14 @@ void AP_MotorsUGV::output(bool armed, float ground_speed, float dt)
     output_regular(armed, ground_speed, _steering, _throttle);
 
     if (have_vectored_thrust() && have_skid_steering()) {
-        // Use regular steer output and current angle reading to calculate skid steer correction
         AP_SWIVEL *swivel = AP::swivel();
         swivel->get_angle(_swivel_angle);
-        // float angle_error = _swivel_steering - _swivel_angle * 4500.0f;
 
-        // Use current angle to determine torque vector
+        // Use current angle and desired angle to determine skid steer correction
+        _swivel_error = _swivel_angle * 4500.0f - _swivel_steering;
+        _swivel_correction = _swivel_error * 0.25;
+
+        // Use current angle and throttle to determine torque vector
         float torque_vector = 0;
         if(!is_zero(_swivel_angle)) {
             float turn_radius = 775 / cosf(M_PI_2 - _swivel_angle);
@@ -346,8 +348,8 @@ void AP_MotorsUGV::output(bool armed, float ground_speed, float dt)
             torque_vector = torque_ratio * throttle_norm * 4500.0f;
         }
 
-        // output_skid_steering(armed, angle_error * -0.25, _swivel_throttle * 0.25, dt);
-        output_skid_steering(armed, torque_vector, _swivel_throttle, dt);
+        // output to swivel as a skid steering style frame
+        output_skid_steering(armed, _swivel_correction + torque_vector, _swivel_throttle, dt);
     } else {
         // output for skid steering style frames
         output_skid_steering(armed, _steering, _throttle, dt);
