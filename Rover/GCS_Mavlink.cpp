@@ -133,9 +133,9 @@ void GCS_MAVLINK_Rover::send_servo_out()
         chan,
         millis(),
         0,  // port 0
-        motor1,
+        rover.g2.motors.get_steering(),
         0,
-        motor3,
+        rover.g2.motors.get_throttle(),
         0,
         0,
         0,
