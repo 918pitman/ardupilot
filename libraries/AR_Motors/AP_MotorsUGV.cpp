@@ -336,7 +336,7 @@ void AP_MotorsUGV::output(bool armed, float ground_speed, float dt)
         swivel->get_angle(_swivel_angle);
 
         // Use current angle and desired angle to determine skid steer correction
-        _swivel_error = _swivel_angle * 4500.0f - _swivel_steering;
+        _swivel_error = _swivel_angle * 4500.0f - _swivel_steering * M_PI_2;
         _swivel_correction = _swivel_error * 0.25;
 
         // Use current angle and throttle to determine torque vector
