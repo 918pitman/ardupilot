@@ -87,13 +87,17 @@ public:
     // true if vehicle is capable of skid steering
     bool have_skid_steering() const;
 
+    // true if vehicle is capable of swivel steering
+    bool have_swivel_steering() const;
+
     // true if vehicle has vectored thrust (i.e. boat with motor on steering servo)
     bool have_vectored_thrust() const { return is_positive(_vector_angle_max); }
 
     // output to motors and steering servos
+    // mix_strthr set to true to input throttle when pivoting
     // ground_speed should be the vehicle's speed over the surface in m/s
     // dt should be expected time between calls to this function
-    void output(bool armed, float ground_speed, float dt);
+    void output(bool armed, bool mix_strthr, float ground_speed, float dt);
 
     // test steering or throttle output as a percentage of the total (range -100 to +100)
     // used in response to DO_MOTOR_TEST mavlink command

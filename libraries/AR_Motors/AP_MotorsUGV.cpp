@@ -304,13 +304,21 @@ bool AP_MotorsUGV::have_skid_steering() const
     return (SRV_Channels::function_assigned(SRV_Channel::k_throttleLeft) && SRV_Channels::function_assigned(SRV_Channel::k_throttleRight)) || is_omni();
 }
 
+/*
+  work out if swivel steering is available
+ */
+bool AP_MotorsUGV::have_swivel_steering() const
+{
+    return have_skid_steering() && have_vectored_thrust();
+}
+
 // true if the vehicle has a mainsail
 bool AP_MotorsUGV::has_sail() const
 {
     return SRV_Channels::function_assigned(SRV_Channel::k_mainsail_sheet) || SRV_Channels::function_assigned(SRV_Channel::k_wingsail_elevator) || SRV_Channels::function_assigned(SRV_Channel::k_mast_rotation);
 }
 
-void AP_MotorsUGV::output(bool armed, float ground_speed, float dt)
+void AP_MotorsUGV::output(bool armed, bool mix_strthr, float ground_speed, float dt)
 {
     // soft-armed overrides passed in armed status
     if (!hal.util->get_soft_armed()) {
@@ -328,21 +336,28 @@ void AP_MotorsUGV::output(bool armed, float ground_speed, float dt)
     // slew limit throttle
     slew_limit_throttle(dt);
 
+    // Move to line 346 after testing
+    // Convert steering into forward throttle signal then max steering in the direction the input was then
+    if (!is_zero(_steering) && is_zero(_throttle)) {
+        _throttle = fabsf(_steering * 100 / 4500.0f);
+        _steering = is_positive(_steering) ? 4500.0f : -4500.0f;
+    }
+
     // output for regular steering/throttle style frames
     output_regular(armed, ground_speed, _steering, _throttle);
 
-    if (have_vectored_thrust() && have_skid_steering()) {
+    if (have_swivel_steering()) {
         AP_SWIVEL *swivel = AP::swivel();
         swivel->get_angle(_swivel_angle);
 
         // Use current angle and desired angle to determine skid steer correction
-        _swivel_error = _swivel_angle * 4500.0f - _swivel_steering * M_PI_2;
+        _swivel_error = _swivel_angle * 4500.0f - _swivel_steering * radians(constrain_float(_vector_angle_max, 0.0f, 90.0f));
         _swivel_correction = _swivel_error * 0.25;
 
         // Use current angle and throttle to determine torque vector
         float torque_vector = 0;
         if(!is_zero(_swivel_angle)) {
-            float turn_radius = 775 / cosf(M_PI_2 - _swivel_angle);
+            float turn_radius = 775 / sinf(_swivel_angle);
             float torque_ratio = 400 * 0.5 / turn_radius;
             float throttle_norm = _swivel_throttle / 100;
             torque_vector = torque_ratio * throttle_norm * 4500.0f;
@@ -801,7 +816,7 @@ void AP_MotorsUGV::output_regular(bool armed, float ground_speed, float steering
     // always allow steering to move
     SRV_Channels::set_output_scaled(SRV_Channel::k_steering, steering);
 
-    if (have_vectored_thrust() && have_skid_steering()) {
+    if (have_swivel_steering()) {
         // store values for nested mixing
         _swivel_steering = steering;
         _swivel_throttle = throttle;
