@@ -339,7 +339,7 @@ void AP_MotorsUGV::output(bool armed, bool mix_strthr, float ground_speed, float
     // Move to line 346 after testing
     // Convert steering into forward throttle signal then max steering in the direction the input was then
     if (!is_zero(_steering) && is_zero(_throttle)) {
-        _throttle = fabsf(_steering * 100 / 4500.0f);
+        _throttle = fabsf(_steering * 10 / 4500.0f);
         _steering = is_positive(_steering) ? 4500.0f : -4500.0f;
     }
 
