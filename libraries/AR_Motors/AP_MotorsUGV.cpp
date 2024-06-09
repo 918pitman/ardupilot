@@ -336,12 +336,11 @@ void AP_MotorsUGV::output(bool armed, bool mix_strthr, float ground_speed, float
     // slew limit throttle
     slew_limit_throttle(dt);
 
-    // Move to line 346 after testing
-    // Convert steering into forward throttle signal then max steering in the direction the input was then
-    // if (!is_zero(_steering) && is_zero(_throttle)) {
-    //     _throttle = fabsf(_steering * 10 / 4500.0f);
-    //     _steering = is_positive(_steering) ? 4500.0f : -4500.0f;
-    // }
+    // Convert steering into forward throttle signal then max out steering in the direction the input was then
+    if (!is_zero(_steering) && is_zero(_throttle) && mix_strthr) {
+        _throttle = fabsf(_steering * 100 / 4500.0f) * (30 / 180);
+        _steering = is_positive(_steering) ? 4500.0f : -4500.0f;
+    }
 
     // output for regular steering/throttle style frames
     output_regular(armed, ground_speed, _steering, _throttle);
