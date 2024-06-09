@@ -336,9 +336,13 @@ void AP_MotorsUGV::output(bool armed, bool mix_strthr, float ground_speed, float
     // slew limit throttle
     slew_limit_throttle(dt);
 
+    // Make these parameters
+    float str_min = 0.1;
+    float pivot_gain = 0.33;
+
     // Convert steering into forward throttle signal then max out steering in the direction the input was then
-    if (!is_zero(_steering) && is_zero(_throttle) && mix_strthr) {
-        _throttle = fabsf(_steering * 100 / 4500.0f) * (30 / 180);
+    if (fabsf(_steering) > 4500.0f * str_min && is_zero(_throttle) && mix_strthr) {
+        _throttle = fabsf(_steering * 100 / 4500.0f) * pivot_gain;
         _steering = is_positive(_steering) ? 4500.0f : -4500.0f;
     }
 
