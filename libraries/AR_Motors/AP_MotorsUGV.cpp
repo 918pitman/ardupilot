@@ -337,7 +337,7 @@ void AP_MotorsUGV::output(bool armed, bool mix_strthr, float ground_speed, float
     slew_limit_throttle(dt);
 
     // Make these parameters
-    float str_min = 0.1;
+    float str_min = 0.05;
     float pivot_gain = 0.33;
 
     _swivel_throttle = _throttle;
@@ -347,6 +347,7 @@ void AP_MotorsUGV::output(bool armed, bool mix_strthr, float ground_speed, float
     if (fabsf(_steering) > 4500.0f * str_min && is_zero(_throttle) && mix_strthr) {
         _swivel_throttle = fabsf(_steering * 100 / 4500.0f) * pivot_gain;
         _swivel_steering = is_positive(_steering) ? 4500.0f : -4500.0f;
+        _scale_steering = false;
     }
 
     // output for regular steering/throttle style frames
@@ -739,7 +740,7 @@ void AP_MotorsUGV::output_regular(bool armed, float ground_speed, float steering
 {
     // output to throttle channels
     if (armed) {
-        if (_scale_steering && !is_zero(throttle)) {
+        if (_scale_steering) {
             // vectored thrust handling
             if (have_vectored_thrust()) {
 
