@@ -739,7 +739,7 @@ void AP_MotorsUGV::output_regular(bool armed, float ground_speed, float steering
 {
     // output to throttle channels
     if (armed) {
-        if (_scale_steering) {
+        if (_scale_steering && !is_zero(throttle)) {
             // vectored thrust handling
             if (have_vectored_thrust()) {
 
