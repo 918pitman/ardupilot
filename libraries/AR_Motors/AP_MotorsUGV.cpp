@@ -340,14 +340,17 @@ void AP_MotorsUGV::output(bool armed, bool mix_strthr, float ground_speed, float
     float str_min = 0.1;
     float pivot_gain = 0.33;
 
+    _swivel_throttle = _throttle;
+    _swivel_steering = _steering;
+
     // Convert steering into forward throttle signal then max out steering in the direction the input was then
     if (fabsf(_steering) > 4500.0f * str_min && is_zero(_throttle) && mix_strthr) {
-        _throttle = fabsf(_steering * 100 / 4500.0f) * pivot_gain;
-        _steering = is_positive(_steering) ? 4500.0f : -4500.0f;
+        _swivel_throttle = fabsf(_steering * 100 / 4500.0f) * pivot_gain;
+        _swivel_steering = is_positive(_steering) ? 4500.0f : -4500.0f;
     }
 
     // output for regular steering/throttle style frames
-    output_regular(armed, ground_speed, _steering, _throttle);
+    output_regular(armed, ground_speed, _swivel_steering, _swivel_throttle);
 
     if (have_swivel_steering()) {
         AP_SWIVEL *swivel = AP::swivel();
