@@ -318,7 +318,7 @@ bool AP_MotorsUGV::has_sail() const
     return SRV_Channels::function_assigned(SRV_Channel::k_mainsail_sheet) || SRV_Channels::function_assigned(SRV_Channel::k_wingsail_elevator) || SRV_Channels::function_assigned(SRV_Channel::k_mast_rotation);
 }
 
-void AP_MotorsUGV::output(bool armed, bool mix_strthr, float ground_speed, float dt)
+void AP_MotorsUGV::output(bool armed, float ground_speed, float dt)
 {
     // soft-armed overrides passed in armed status
     if (!hal.util->get_soft_armed()) {
@@ -336,42 +336,12 @@ void AP_MotorsUGV::output(bool armed, bool mix_strthr, float ground_speed, float
     // slew limit throttle
     slew_limit_throttle(dt);
 
-    // Make these parameters
-    float str_min = 0.05;
-    float pivot_gain = 0.33;
-
-    _swivel_throttle = _throttle;
-    _swivel_steering = _steering;
-
-    // Convert steering into forward throttle signal then max out steering in the direction the input was then
-    if (fabsf(_steering) > 4500.0f * str_min && is_zero(_throttle) && mix_strthr) {
-        _swivel_throttle = fabsf(_steering * 100 / 4500.0f) * pivot_gain;
-        _swivel_steering = is_positive(_steering) ? 4500.0f : -4500.0f;
-        _scale_steering = false;
-    }
-
     // output for regular steering/throttle style frames
-    output_regular(armed, ground_speed, _swivel_steering, _swivel_throttle);
+    output_regular(armed, ground_speed, _steering, _throttle);
 
     if (have_swivel_steering()) {
-        AP_SWIVEL *swivel = AP::swivel();
-        swivel->get_angle(_swivel_angle);
-
-        // Use current angle and desired angle to determine skid steer correction
-        _swivel_error = _swivel_angle * 4500.0f - _swivel_steering * radians(constrain_float(_vector_angle_max, 0.0f, 90.0f));
-        _swivel_correction = _swivel_error * 0.25;
-
-        // Use current angle and throttle to determine torque vector
-        float torque_vector = 0;
-        if(!is_zero(_swivel_angle)) {
-            float turn_radius = 775 / sinf(_swivel_angle);
-            float torque_ratio = 400 * 0.5 / turn_radius;
-            float throttle_norm = _swivel_throttle / 100;
-            torque_vector = torque_ratio * throttle_norm * 4500.0f;
-        }
-
-        // output to swivel as a skid steering style frame
-        output_skid_steering(armed, _swivel_correction + torque_vector, _swivel_throttle, dt);
+        // output for swivel steering style frames
+        output_skid_steering(armed, _swivel_steering, _swivel_throttle, dt);
     } else {
         // output for skid steering style frames
         output_skid_steering(armed, _steering, _throttle, dt);
@@ -743,42 +713,47 @@ void AP_MotorsUGV::output_regular(bool armed, float ground_speed, float steering
         if (_scale_steering) {
             // vectored thrust handling
             if (have_vectored_thrust()) {
+                // Pivot turning with vectored thrust
+                if (fabsf(steering) > 300.0f && is_zero(throttle)) {
+                    throttle = fabsf(steering * 100 / 4500.0f);
+                    steering = is_positive(steering) ? 4500.0f : -4500.0f;
+                } else {
+                    // normalise desired steering and throttle to ease calculations
+                    float steering_norm = steering / 4500.0f;
+                    const float throttle_norm = throttle * 0.01f;
 
-                // normalise desired steering and throttle to ease calculations
-                float steering_norm = steering / 4500.0f;
-                const float throttle_norm = throttle * 0.01f;
-
-                // steering can never be more than throttle * tan(_vector_angle_max)
-                const float vector_angle_max_rad = radians(constrain_float(_vector_angle_max, 0.0f, 90.0f));
-                const float steering_norm_lim = fabsf(throttle_norm * tanf(vector_angle_max_rad));
-                if (fabsf(steering_norm) > steering_norm_lim) {
-                    if (is_positive(steering_norm)) {
-                        steering_norm = steering_norm_lim;
-                    }
-                    if (is_negative(steering_norm)) {
-                        steering_norm = -steering_norm_lim;
-                    }
-                    limit.steer_right = true;
-                    limit.steer_left = true;
-                }
-
-                if (!is_zero(throttle_norm)) {
-                    // calculate steering angle
-                    float steering_angle_rad = atanf(steering_norm / throttle_norm);
-                    // limit steering angle to vector_angle_max
-                    if (fabsf(steering_angle_rad) > vector_angle_max_rad) {
-                        steering_angle_rad = constrain_float(steering_angle_rad, -vector_angle_max_rad, vector_angle_max_rad);
+                    // steering can never be more than throttle * tan(_vector_angle_max)
+                    const float vector_angle_max_rad = radians(constrain_float(_vector_angle_max, 0.0f, 90.0f));
+                    const float steering_norm_lim = fabsf(throttle_norm * tanf(vector_angle_max_rad));
+                    if (fabsf(steering_norm) > steering_norm_lim) {
+                        if (is_positive(steering_norm)) {
+                            steering_norm = steering_norm_lim;
+                        }
+                        if (is_negative(steering_norm)) {
+                            steering_norm = -steering_norm_lim;
+                        }
                         limit.steer_right = true;
                         limit.steer_left = true;
-                     }
+                    }
 
-                    // convert steering angle to steering output
-                    steering = steering_angle_rad / vector_angle_max_rad * 4500.0f;
+                    if (!is_zero(throttle_norm)) {
+                        // calculate steering angle
+                        float steering_angle_rad = atanf(steering_norm / throttle_norm);
+                        // limit steering angle to vector_angle_max
+                        if (fabsf(steering_angle_rad) > vector_angle_max_rad) {
+                            steering_angle_rad = constrain_float(steering_angle_rad, -vector_angle_max_rad, vector_angle_max_rad);
+                            limit.steer_right = true;
+                            limit.steer_left = true;
+                        }
 
-                    // scale up throttle to compensate for steering angle
-                    const float throttle_scaler_inv = cosf(steering_angle_rad);
-                    if (!is_zero(throttle_scaler_inv)) {
-                        throttle /= throttle_scaler_inv;
+                        // convert steering angle to steering output
+                        steering = steering_angle_rad / vector_angle_max_rad * 4500.0f;
+
+                        // scale up throttle to compensate for steering angle
+                        const float throttle_scaler_inv = cosf(steering_angle_rad);
+                        if (!is_zero(throttle_scaler_inv)) {
+                            throttle /= throttle_scaler_inv;
+                        }
                     }
                 }
             } else {
@@ -823,12 +798,25 @@ void AP_MotorsUGV::output_regular(bool armed, float ground_speed, float steering
     // always allow steering to move
     SRV_Channels::set_output_scaled(SRV_Channel::k_steering, steering);
 
+    // send output to nested skid-steer mixer
     if (have_swivel_steering()) {
-        // store values for nested mixing
-        _swivel_steering = steering;
+        AP_SWIVEL *swivel = AP::swivel();
+        swivel->get_angle(_swivel_angle);
+
+        // Use current angle and desired angle to determine skid steer correction
+        _swivel_error = _swivel_angle * 4500.0f - steering * radians(constrain_float(_vector_angle_max, 0.0f, 90.0f));
+        float correction = _swivel_error * 0.25;
+
+        // Use current angle and throttle to determine torque vector
+        float torque_vector = 0;
+        if(!is_zero(_swivel_angle)) {
+            float turn_radius = 775 / sinf(_swivel_angle);
+            float torque_ratio = 400 * 0.5 / turn_radius;
+            torque_vector = torque_ratio * throttle * 0.01f * 4500.0f;
+        }
+        _swivel_steering = correction + torque_vector;
         _swivel_throttle = throttle;
     }
-
 }
 
 // output to skid steering channels

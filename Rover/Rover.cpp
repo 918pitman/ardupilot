@@ -77,7 +77,7 @@ const AP_Scheduler::Task Rover::scheduler_tasks[] = {
     SCHED_TASK_CLASS(AP_OpticalFlow,      &rover.optflow,          update,         200, 160,  11),
 #endif
     SCHED_TASK(update_current_mode,   400,    200,  12),
-    SCHED_TASK(set_servos,            400,    200,  15),
+    SCHED_TASK(set_servos,            400,    300,  15),
     SCHED_TASK_CLASS(AP_GPS,              &rover.gps,              update,         50,  300,  18),
     SCHED_TASK_CLASS(AP_Baro,             &rover.barometer,        update,         10,  200,  21),
 #if AP_BEACON_ENABLED
@@ -133,7 +133,7 @@ const AP_Scheduler::Task Rover::scheduler_tasks[] = {
     SCHED_TASK_CLASS(AP_Scheduler,        &rover.scheduler,        update_logging, 0.1, 200, 114),
 #endif
 #if AP_RSSI_ENABLED
-    SCHED_TASK_CLASS(AP_SWIVEL,             &rover.g2.swivel,             update,         10,  300,  117),
+    SCHED_TASK_CLASS(AP_SWIVEL,             &rover.g2.swivel,             update,         50,  300,  117),
 #endif
 #if STATS_ENABLED == ENABLED
     SCHED_TASK(stats_update,            1,    200, 120),

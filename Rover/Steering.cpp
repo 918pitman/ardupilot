@@ -14,7 +14,6 @@ void Rover::set_servos(void)
         if (!g2.attitude_control.get_forward_speed(speed)) {
             speed = 0.0f;
         }
-        bool mix_strthr = rover.control_mode != &rover.mode_manual;
-        g2.motors.output(arming.is_armed(), mix_strthr, speed, G_Dt);
+        g2.motors.output(arming.is_armed(), speed, G_Dt);
     }
 }

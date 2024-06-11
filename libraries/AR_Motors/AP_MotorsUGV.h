@@ -51,6 +51,12 @@ public:
     float get_throttle() const { return _throttle; }
     void set_throttle(float throttle);
 
+    // get swivel state parameters
+    float get_swivel_steering() const { return _swivel_steering; }
+    float get_swivel_throttle() const { return _swivel_throttle; }
+    float get_swivel_angle() const { return _swivel_angle; }
+    float get_swivel_error() const { return _swivel_error; }
+
     // get or set roll as a value from -1 to 1
     float get_roll() const { return _roll; }
     void set_roll(float roll);
@@ -94,10 +100,9 @@ public:
     bool have_vectored_thrust() const { return is_positive(_vector_angle_max); }
 
     // output to motors and steering servos
-    // mix_strthr set to true to input throttle when pivoting
     // ground_speed should be the vehicle's speed over the surface in m/s
     // dt should be expected time between calls to this function
-    void output(bool armed, bool mix_strthr, float ground_speed, float dt);
+    void output(bool armed, float ground_speed, float dt);
 
     // test steering or throttle output as a percentage of the total (range -100 to +100)
     // used in response to DO_MOTOR_TEST mavlink command
@@ -220,7 +225,6 @@ private:
     float   _swivel_throttle;    // requested swivel throttle as a value from -100 to 100
     float   _swivel_angle;       // current angle of the swivel in radians
     float   _swivel_error;       // current error of the swivel in radians
-    float   _swivel_correction;  // correction input as a value from -4500 to +4500
     float   _throttle_prev; // throttle input from previous iteration
     bool    _scale_steering = true; // true if we should scale steering by speed or angle
     float   _lateral;  // requested lateral input as a value from -100 to +100
