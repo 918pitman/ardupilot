@@ -704,11 +704,13 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     // @Group: CIRC
     // @Path: mode_circle.cpp
     AP_SUBGROUPINFO(mode_circle, "CIRC", 57, ParametersG2, ModeCircle),
+
 #if AP_SWIVEL_ENABLED
     // @Group: SWIVEL
     // @Path: ../libraries/AP_SWIVEL/AP_SWIVEL.cpp
     AP_SUBGROUPINFO(swivel, "SWIVEL", 58, ParametersG2, AP_SWIVEL),
 #endif
+
     AP_GROUPEND
 };
 
