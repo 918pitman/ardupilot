@@ -129,10 +129,14 @@ void GCS_MAVLINK_Rover::send_servo_out()
         motor4 = rover.g2.motors.get_swivel_error();
     } else if (rover.g2.motors.have_skid_steering()) {
         motor1 = 10000 * (SRV_Channels::get_output_scaled(SRV_Channel::k_throttleLeft) / 1000.0f);
+        motor2 = 0;
         motor3 = 10000 * (SRV_Channels::get_output_scaled(SRV_Channel::k_throttleRight) / 1000.0f);
+        motor4 = 0;
     } else {
         motor1 = 10000 * (SRV_Channels::get_output_scaled(SRV_Channel::k_steering) / 4500.0f);
+        motor2 = 0;
         motor3 = 10000 * (SRV_Channels::get_output_scaled(SRV_Channel::k_throttle) / 100.0f);
+        motor4 = 0;
     }
     mavlink_msg_rc_channels_scaled_send(
         chan,
