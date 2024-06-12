@@ -125,8 +125,8 @@ void GCS_MAVLINK_Rover::send_servo_out()
     if (rover.g2.motors.have_swivel_steering()) {
         motor1 = rover.g2.motors.get_swivel_steering();
         motor2 = rover.g2.motors.get_swivel_throttle();
-        motor3 = rover.g2.motors.get_swivel_angle();
-        motor4 = rover.g2.motors.get_swivel_error();
+        motor3 = degrees(rover.g2.motors.get_swivel_angle());
+        motor4 = degrees(rover.g2.motors.get_swivel_error());
     } else if (rover.g2.motors.have_skid_steering()) {
         motor1 = 10000 * (SRV_Channels::get_output_scaled(SRV_Channel::k_throttleLeft) / 1000.0f);
         motor2 = 0;

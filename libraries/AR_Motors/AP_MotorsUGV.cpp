@@ -326,6 +326,11 @@ void AP_MotorsUGV::output(bool armed, float ground_speed, float dt)
         _throttle = 0.0f;
     }
 
+    if (have_swivel_steering()) {
+        AP_SWIVEL *swivel = AP::swivel();
+        swivel->get_angle(_swivel_angle);
+    }
+
     // clear limit flags
     // output_ methods are responsible for setting them to true if required on each iteration
     limit.steer_left = limit.steer_right = limit.throttle_lower = limit.throttle_upper = false;
@@ -715,7 +720,7 @@ void AP_MotorsUGV::output_regular(bool armed, float ground_speed, float steering
             if (have_vectored_thrust()) {
                 // Pivot turning with vectored thrust
                 if (fabsf(steering) > 300.0f && is_zero(throttle)) {
-                    throttle = fabsf(steering * 100 / 4500.0f) * 0.5;
+                    throttle = fabsf(steering * 100 / 4500.0f);
                     steering = is_positive(steering) ? 4500.0f : -4500.0f;
                 } else {
                     // normalise desired steering and throttle to ease calculations
@@ -750,7 +755,12 @@ void AP_MotorsUGV::output_regular(bool armed, float ground_speed, float steering
                         steering = steering_angle_rad / vector_angle_max_rad * 4500.0f;
 
                         // scale up throttle to compensate for steering angle
-                        const float throttle_scaler_inv = cosf(steering_angle_rad);
+                        float throttle_scaler_inv = 1;
+                        if (have_swivel_steering()) {
+                            throttle_scaler_inv = cosf(_swivel_angle);
+                        } else {
+                            throttle_scaler_inv = cosf(steering_angle_rad);
+                        }
                         if (!is_zero(throttle_scaler_inv)) {
                             throttle /= throttle_scaler_inv;
                         }
@@ -800,12 +810,9 @@ void AP_MotorsUGV::output_regular(bool armed, float ground_speed, float steering
 
     // send output to nested skid-steer mixer
     if (have_swivel_steering()) {
-        AP_SWIVEL *swivel = AP::swivel();
-        swivel->get_angle(_swivel_angle);
-
         // Use current angle and desired angle to determine skid steer correction
-        _swivel_error = _swivel_angle * 4500.0f - steering * radians(constrain_float(_vector_angle_max, 0.0f, 90.0f));
-        float correction = _swivel_error * 0.25;
+        _swivel_error = _swivel_angle - steering * radians(constrain_float(_vector_angle_max, 0.0f, 90.0f)) / 4500.0f;
+        float correction = _swivel_error * 4500.0f * 0.25;
 
         // Use current angle and throttle to determine torque vector
         float torque_vector = 0;
