@@ -22,6 +22,23 @@ ArduPilot is the most advanced, full-featured, and reliable open source autopilo
 It has been under development since 2010 by a diverse team of professional engineers, computer scientists, and community contributors.
 Our autopilot software is capable of controlling almost any vehicle system imaginable, from conventional airplanes, quad planes, multi-rotors, and helicopters to rovers, boats, balance bots, and even submarines.
 It is continually being expanded to provide support for new emerging vehicle types.
+## Notes about this fork: ##
+
+- Added library for measuring swivel steer angle via ADC and/or DroneCAN. (AP_SWIVEL)
+
+- Controllers pickup vehicle config by proxy of other params. (i.e. Servo Assignment and MOT_VEC_ANGLEMAX)
+
+- Should still be compatible with all other vehicles, untested though.
+
+- Uses the skid steer mixer to correct swivel angle, which is nested inside the regular mixer using vectored thrust.
+
+- Allows pivot turning with vector thrust vehicles capable of +/- 90 degree steer angle.
+
+- Acro mode modification to prevent I-term oscillations when stationary.
+
+- Assumes the swivel angle will always be able to correct quickly, does not handle swivel lock ups or prolonged, large errors.
+
+- Still needs more parameterization, some hard-coded values. (primarily wheelbase and track width)
 
 ## The ArduPilot project is made up of: ##
 
