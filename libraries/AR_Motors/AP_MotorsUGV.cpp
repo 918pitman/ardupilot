@@ -755,7 +755,7 @@ void AP_MotorsUGV::output_regular(bool armed, float ground_speed, float steering
                     if (!is_zero(throttle_scaler_inv)) {
                         throttle /= throttle_scaler_inv;
                     }
-                } else {
+                } else if (!is_zero(steering)){
                     // Pivot turning with vectored thrust
                     throttle = fabsf(steering * 100 / 4500.0f);
                     steering = is_positive(steering) ? 4500.0f : -4500.0f;
