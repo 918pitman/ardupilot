@@ -751,7 +751,7 @@ void AP_MotorsUGV::output_regular(bool armed, float ground_speed, float steering
                     steering = steering_angle_rad / vector_angle_max_rad * 4500.0f;
 
                     // scale up throttle to compensate for steering angle
-                    const float throttle_scaler_inv = have_swivel_steering() ? cosf(_swivel_angle) : cosf(steering_angle_rad);
+                    const float throttle_scaler_inv = cosf(steering_angle_rad);
                     if (!is_zero(throttle_scaler_inv)) {
                         throttle /= throttle_scaler_inv;
                     }
