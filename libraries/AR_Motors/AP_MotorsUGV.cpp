@@ -757,8 +757,14 @@ void AP_MotorsUGV::output_regular(bool armed, float ground_speed, float steering
                     }
                 } else if (!is_zero(steering)){
                     // Pivot turning with vectored thrust
+                    // TODO: Choose the closest angle (-90 or 90) to prevent 180 degree errors that would occur during a yaw overshoot
                     throttle = fabsf(steering * 100 / 4500.0f);
                     steering = is_positive(steering) ? 4500.0f : -4500.0f;
+                } else {
+                    // Setting throttle and steering to zero for now
+                    // TODO: add AHRS-based steer set-point to prevent rolling when parked on hills
+                    throttle = 0.0f;
+                    steering = 0.0f;
                 }
             } else {
                 // scale steering down as speed increase above MOT_SPD_SCA_BASE (1 m/s default)
