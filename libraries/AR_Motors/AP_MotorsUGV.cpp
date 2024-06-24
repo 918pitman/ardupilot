@@ -119,6 +119,36 @@ const AP_Param::GroupInfo AP_MotorsUGV::var_info[] = {
     // @User: Advanced
     AP_GROUPINFO("THST_ASYM", 14, AP_MotorsUGV, _thrust_asymmetry, 1.0f),
 
+    // @Param: WHEELBASE
+    // @DisplayName: Distance between front and back axles
+    // @Description: Distance between front and back axles, needed for torque vector calculations
+    // @Units: meters
+    // @Range: 0.1 10.0
+    // @User: Advanced
+    AP_GROUPINFO("WHEELBASE", 15, AP_MotorsUGV, _wheelbase, 0.775f),
+
+    // @Param: TRACKWIDTH
+    // @DisplayName: Distance between left and right drive wheels
+    // @Description: Distance between left and right drive wheels, needed for torque vector calculations
+    // @Units: meters
+    // @Range: 0.1 10.0
+    // @User: Advanced
+    AP_GROUPINFO("TRACKWIDTH", 16, AP_MotorsUGV, _trackwidth, 0.4f),
+
+    // @Param: STR_CRTN_P
+    // @DisplayName: Swivel Steer Gain
+    // @Description: Translates Swivel angle error into steering input for skid-steer mixer.
+    // @Range: 0 1.0
+    // @User: Advanced
+    AP_GROUPINFO("STR_CRTN_P", 17, AP_MotorsUGV, _swivel_str_gain, 0.25f),
+
+    // @Param: STR_CRTN_MAX
+    // @DisplayName: Max steering input into skid-steer mixer allowed for Swivel angle corrections
+    // @Description:
+    // @Range: 0 1.0
+    // @User: Advanced
+    AP_GROUPINFO("STR_CRTN_MAX", 18, AP_MotorsUGV, _swivel_str_max, 0.25f),
+
     AP_GROUPEND
 };
 
@@ -812,13 +842,15 @@ void AP_MotorsUGV::output_regular(bool armed, float ground_speed, float steering
     if (have_swivel_steering()) {
         // Use current angle and desired angle to determine skid steer correction
         _swivel_error = _swivel_angle - steering * radians(constrain_float(_vector_angle_max, 0.0f, 90.0f)) / 4500.0f;
-        float correction = _swivel_error * 4500.0f * 0.25;
+        float correction = _swivel_error * _swivel_str_gain;
+        correction = constrain_float(correction, -_swivel_str_max, _swivel_str_max);
+        correction *= 4500.0f;
 
         // Use current angle and throttle to determine torque vector
         float torque_vector = 0;
         if(!is_zero(_swivel_angle)) {
-            float turn_radius = 775 / sinf(_swivel_angle);
-            float torque_ratio = 400 * 0.5 / turn_radius;
+            float turn_radius = _wheelbase / sinf(_swivel_angle);
+            float torque_ratio = _trackwidth * 0.5 / turn_radius;
             torque_vector = torque_ratio * throttle * 0.01f * 4500.0f;
         }
         _swivel_steering = correction + torque_vector;

@@ -217,6 +217,10 @@ private:
     AP_Float _vector_angle_max;  // angle between steering's middle position and maximum position when using vectored thrust.  zero to disable vectored thrust
     AP_Float _speed_scale_base;  // speed above which steering is scaled down when using regular steering/throttle vehicles.  zero to disable speed scaling
     AP_Float _steering_throttle_mix; // Steering vs Throttle priorisation.  Higher numbers prioritise steering, lower numbers prioritise throttle.  Only valid for Skid Steering vehicles
+    AP_Float _wheelbase; // Distance between front and back axles in meters
+    AP_Float _trackwidth; // Distance between left and right drive wheels in meters
+    AP_Float _swivel_str_gain; // Gain for translating swivel angle error into skid-steer correction
+    AP_Float _swivel_str_max; // Max skid-steer input allowed for correcting swivel angle
 
     // internal variables
     float   _steering;  // requested steering as a value from -4500 to +4500
