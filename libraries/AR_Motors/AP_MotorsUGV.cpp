@@ -785,19 +785,12 @@ void AP_MotorsUGV::output_regular(bool armed, float ground_speed, float steering
                     if (!is_zero(throttle_scaler_inv)) {
                         throttle /= throttle_scaler_inv;
                     }
-                } else {
+                } else if (!is_zero(steering)) {
                     // Pivot turning with vectored thrust
-                    if (!is_zero(steering)) {
-                        throttle = fabsf(steering * 100 / 4500.0f);
-                        if (is_positive(steering) != is_positive(_swivel_angle)) {
-                            throttle *= -1;
-                        }
-                    } else {
-                        throttle = 0.0f;
-                    }
-                    // Choose the closest angle (-90 or 90)
-                    steering = is_positive(_swivel_angle) ? 4500.0f : -4500.0f;
+                    throttle = fabsf(steering * 100 / 4500.0f);
+                    steering = is_positive(steering) ? 4500.0f : -4500.0f;
                 }
+
             } else {
                 // scale steering down as speed increase above MOT_SPD_SCA_BASE (1 m/s default)
                 if (is_positive(_speed_scale_base) && (fabsf(ground_speed) > _speed_scale_base)) {
