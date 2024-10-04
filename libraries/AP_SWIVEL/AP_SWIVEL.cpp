@@ -65,6 +65,15 @@ bool AP_SWIVEL::get_angle(float &angle_value) const
     return true;
 }
 
+bool AP_SWIVEL::get_rate(float &rate_value) const
+{
+    if (!enabled()) {
+        return false;
+    }
+    rate_value = state.rate;
+    return true;
+}
+
 AP_SWIVEL *AP_SWIVEL::_singleton;
 
 namespace AP {

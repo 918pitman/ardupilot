@@ -35,6 +35,7 @@ void AP_SWIVEL_DroneCAN::handle_angle(AP_DroneCAN *ap_dronecan, const CanardRxTr
     }
     _driver->last_reading_ms = AP_HAL::millis();
     _driver->angle = msg.position;
+    _driver->rate = msg.speed;
 }
 
 void AP_SWIVEL_DroneCAN::update(void)
@@ -42,8 +43,10 @@ void AP_SWIVEL_DroneCAN::update(void)
     WITH_SEMAPHORE(_driver_sem);
     state.last_reading_ms = last_reading_ms;
     state.angle = angle;
+    state.rate = rate;
     if ((AP_HAL::millis() - state.last_reading_ms) > 1000) {
         state.angle = 0;
+        state.rate = 0;
     }
 }
 

@@ -24,6 +24,7 @@ private:
     float  volt_range      = volt_max - volt_min;
     float  volt_center     = volt_min + (volt_range / 2);
     float  volt_per_radian = volt_range / M_PI;
+    float  last_angle = 0.0;
 };
 
 #endif  // AP_SWIVEL_PIN_ENABLED

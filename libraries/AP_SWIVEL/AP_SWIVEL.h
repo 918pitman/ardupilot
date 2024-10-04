@@ -34,6 +34,7 @@ public:
 
     struct SWIVEL_State {
         float                  angle;
+        float                  rate;
         uint32_t               last_reading_ms;
     };
 
@@ -45,6 +46,7 @@ public:
     void update(void);
     Type get_type() const { return (Type)((uint8_t)_params.type); }
     bool get_angle(float &angle_value) const;
+    bool get_rate(float &rate_value) const;
     bool enabled() const;
 
     static AP_SWIVEL *get_singleton() { return _singleton; }

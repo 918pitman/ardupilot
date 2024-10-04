@@ -17,10 +17,14 @@ void AP_SWIVEL_Analog::update(void)
 {
     if (!source || !source->set_pin(volt_pin)) {
         state.angle = 0;
+        state.rate = 0;
     }
+    uint32_t current_time = AP_HAL::millis();
     float voltage = source->voltage_average();
     state.angle = (voltage - volt_center) / volt_per_radian;
-    state.last_reading_ms = AP_HAL::millis();
+    state.rate = (state.angle - last_angle) / (current_time - state.last_reading_ms) * 1000;
+    state.last_reading_ms = current_time;
+    last_angle = state.angle;
 }
 
 #endif  // AP_SWIVEL_PIN_ENABLED

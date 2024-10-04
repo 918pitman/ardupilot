@@ -22,6 +22,7 @@ private:
     static void handle_angle(AP_DroneCAN *ap_dronecan, const CanardRxTransfer& transfer, const uavcan_equipment_actuator_Status &msg);
 
     float angle;
+    float rate;
     uint32_t last_reading_ms;
 
     static AP_SWIVEL_DroneCAN *_driver;
