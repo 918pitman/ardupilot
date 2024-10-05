@@ -13,7 +13,7 @@
 #include <AP_Airspeed/AP_Airspeed.h>
 #include <AP_RangeFinder/AP_RangeFinder.h>
 #include <AP_Proximity/AP_Proximity.h>
-#include <AP_SWIVEL/AP_SWIVEL.h>
+#include <AP_Swivel/AP_Swivel.h>
 #include <AP_EFI/AP_EFI.h>
 #include <AP_KDECAN/AP_KDECAN.h>
 #include <AP_MSP/AP_MSP.h>
@@ -283,7 +283,7 @@ public:
 #endif
 
 #ifdef HAL_PERIPH_ENABLE_SWIVEL
-    AP_SWIVEL swivel;
+    AP_Swivel swivel;
 #endif
 
 #ifdef HAL_PERIPH_ENABLE_PWM_HARDPOINT

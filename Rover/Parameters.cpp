@@ -707,8 +707,8 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
 
 #if AP_SWIVEL_ENABLED
     // @Group: SWIVEL
-    // @Path: ../libraries/AP_SWIVEL/AP_SWIVEL.cpp
-    AP_SUBGROUPINFO(swivel, "SWIVEL", 58, ParametersG2, AP_SWIVEL),
+    // @Path: ../libraries/AP_Swivel/AP_Swivel.cpp
+    AP_SUBGROUPINFO(swivel, "SWIVEL", 58, ParametersG2, AP_Swivel),
 #endif
 
     AP_GROUPEND

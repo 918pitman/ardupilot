@@ -10,7 +10,7 @@
 #include <AP_Follow/AP_Follow.h>
 #include "AP_Gripper/AP_Gripper.h"
 #include <AP_Proximity/AP_Proximity.h>
-#include <AP_SWIVEL/AP_SWIVEL.h>
+#include <AP_Swivel/AP_Swivel.h>
 #include "AP_Rally.h"
 #include <AP_SmartRTL/AP_SmartRTL.h>
 #include <AP_Stats/AP_Stats.h>
@@ -343,7 +343,7 @@ public:
     AP_Int8 frame_class;
 
 #if AP_SWIVEL_ENABLED
-    AP_SWIVEL swivel;
+    AP_Swivel swivel;
 #endif
 
 #if HAL_PROXIMITY_ENABLED

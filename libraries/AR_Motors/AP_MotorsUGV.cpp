@@ -17,7 +17,7 @@
 #include <GCS_MAVLink/GCS.h>
 #include "AP_MotorsUGV.h"
 #include <AP_Relay/AP_Relay.h>
-#include <AP_SWIVEL/AP_SWIVEL.h>
+#include <AP_Swivel/AP_Swivel.h>
 
 #define SERVO_MAX 4500  // This value represents 45 degrees and is just an arbitrary representation of servo max travel.
 
@@ -357,7 +357,7 @@ void AP_MotorsUGV::output(bool armed, float ground_speed, float dt)
     }
 
     if (have_swivel_steering()) {
-        AP_SWIVEL *swivel = AP::swivel();
+        AP_Swivel *swivel = AP::swivel();
         swivel->get_angle(_swivel_angle);
     }
 

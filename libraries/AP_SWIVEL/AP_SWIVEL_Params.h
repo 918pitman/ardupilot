@@ -1,12 +1,12 @@
 #pragma once
 #include <AP_Param/AP_Param.h>
-#include "AP_SWIVEL_config.h"
+#include "AP_Swivel_config.h"
 
-class AP_SWIVEL_Params {
+class AP_Swivel_Params {
 
 public:
 
-    AP_SWIVEL_Params(void);
+    AP_Swivel_Params(void);
 
     AP_Int8  type;
     AP_Int8  volt_pin;

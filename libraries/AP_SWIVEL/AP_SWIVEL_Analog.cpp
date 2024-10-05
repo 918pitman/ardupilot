@@ -1,19 +1,19 @@
-#include "AP_SWIVEL_config.h"
+#include "AP_Swivel_config.h"
 
 #if AP_SWIVEL_PIN_ENABLED
 
-#include "AP_SWIVEL_Analog.h"
+#include "AP_Swivel_Analog.h"
 #include <AP_HAL/AP_HAL.h>
 
 extern const AP_HAL::HAL& hal;
 
-AP_SWIVEL_Analog::AP_SWIVEL_Analog(AP_SWIVEL &_ap_swivel, AP_SWIVEL::SWIVEL_State &_state) :
-    AP_SWIVEL_Backend(_ap_swivel, _state)
+AP_Swivel_Analog::AP_Swivel_Analog(AP_Swivel &_ap_swivel, AP_Swivel::Swivel_State &_state) :
+    AP_Swivel_Backend(_ap_swivel, _state)
 {
     source = hal.analogin->channel(ANALOG_INPUT_NONE);
 }
 
-void AP_SWIVEL_Analog::update(void)
+void AP_Swivel_Analog::update(void)
 {
     if (!source || !source->set_pin(volt_pin)) {
         state.angle = 0;

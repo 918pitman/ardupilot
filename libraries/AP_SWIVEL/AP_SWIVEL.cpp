@@ -1,62 +1,62 @@
-#include "AP_SWIVEL.h"
+#include "AP_Swivel.h"
 
 #if AP_SWIVEL_ENABLED
 
-#include "AP_SWIVEL_Backend.h"
-#include "AP_SWIVEL_Analog.h"
-#include "AP_SWIVEL_DroneCAN.h"
+#include "AP_Swivel_Backend.h"
+#include "AP_Swivel_Analog.h"
+#include "AP_Swivel_DroneCAN.h"
 
 extern const AP_HAL::HAL& hal;
 
-const AP_Param::GroupInfo AP_SWIVEL::var_info[] = {
+const AP_Param::GroupInfo AP_Swivel::var_info[] = {
     // @Group: 1_
-    // @Path: AP_SWIVEL_Params.cpp
-    AP_SUBGROUPINFO(_params, "1_", 0, AP_SWIVEL, AP_SWIVEL_Params),
+    // @Path: AP_Swivel_Params.cpp
+    AP_SUBGROUPINFO(_params, "1_", 0, AP_Swivel, AP_Swivel_Params),
 
     AP_GROUPEND
 };
 
-AP_SWIVEL::AP_SWIVEL(void)
+AP_Swivel::AP_Swivel(void)
 {
     AP_Param::setup_object_defaults(this, var_info);
 
     if (_singleton != nullptr) {
-        AP_HAL::panic("AP_SWIVEL must be singleton");
+        AP_HAL::panic("AP_Swivel must be singleton");
     }
     _singleton = this;
 }
 
-void AP_SWIVEL::init(void)
+void AP_Swivel::init(void)
 {
     switch (get_type()) {
         case Type::NONE:
             return;
 #if AP_SWIVEL_PIN_ENABLED
         case Type::ANALOG:
-            driver = new AP_SWIVEL_Analog(*this, state);
+            driver = new AP_Swivel_Analog(*this, state);
             break;
 #endif
 #if AP_SWIVEL_DRONECAN_ENABLED
         case Type::DRONECAN:
-            driver = new AP_SWIVEL_DroneCAN(*this, state);
+            driver = new AP_Swivel_DroneCAN(*this, state);
             break;
 #endif
     }
 }
 
-void AP_SWIVEL::update(void)
+void AP_Swivel::update(void)
 {
     if (driver != nullptr) {
         driver->update();
     }
 }
 
-bool AP_SWIVEL::enabled() const
+bool AP_Swivel::enabled() const
 {
     return (get_type() != Type::NONE);
 }
 
-bool AP_SWIVEL::get_angle(float &angle_value) const
+bool AP_Swivel::get_angle(float &angle_value) const
 {
     if (!enabled()) {
         return false;
@@ -65,7 +65,7 @@ bool AP_SWIVEL::get_angle(float &angle_value) const
     return true;
 }
 
-bool AP_SWIVEL::get_rate(float &rate_value) const
+bool AP_Swivel::get_rate(float &rate_value) const
 {
     if (!enabled()) {
         return false;
@@ -74,13 +74,13 @@ bool AP_SWIVEL::get_rate(float &rate_value) const
     return true;
 }
 
-AP_SWIVEL *AP_SWIVEL::_singleton;
+AP_Swivel *AP_Swivel::_singleton;
 
 namespace AP {
 
-AP_SWIVEL *swivel()
+AP_Swivel *swivel()
 {
-    return AP_SWIVEL::get_singleton();
+    return AP_Swivel::get_singleton();
 }
 
 }

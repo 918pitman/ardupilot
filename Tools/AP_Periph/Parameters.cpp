@@ -652,8 +652,8 @@ const AP_Param::Info AP_Periph_FW::var_info[] = {
 
 #ifdef HAL_PERIPH_ENABLE_SWIVEL
     // @Group: SWIVEL
-    // @Path: ../libraries/AP_SWIVEL/AP_SWIVEL.cpp
-    GOBJECT(swivel,                "SWIVEL", AP_SWIVEL),
+    // @Path: ../libraries/AP_Swivel/AP_Swivel.cpp
+    GOBJECT(swivel,                "SWIVEL", AP_Swivel),
 #endif
 
     AP_VAREND
