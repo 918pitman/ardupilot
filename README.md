@@ -24,7 +24,7 @@ Our autopilot software is capable of controlling almost any vehicle system imagi
 It is continually being expanded to provide support for new emerging vehicle types.
 ## Notes about this fork: ##
 
-- Added library for measuring swivel steer angle via ADC and/or DroneCAN. (AP_SWIVEL)
+- Added library for measuring swivel steer angle via ADC and/or DroneCAN. (AP_Swivel)
 
 - Controllers pickup vehicle config by proxy of other params. (i.e. Servo Assignment and MOT_VEC_ANGLEMAX)
 

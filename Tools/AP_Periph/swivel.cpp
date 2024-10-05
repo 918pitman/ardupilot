@@ -10,7 +10,7 @@
 
 void AP_Periph_FW::can_swivel_update()
 {
-    if (swivel.get_type() == AP_SWIVEL::Type::NONE) {
+    if (swivel.get_type() == AP_Swivel::Type::NONE) {
         return;
     }
 
