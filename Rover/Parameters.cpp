@@ -709,6 +709,10 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     // @Group: SWIVEL
     // @Path: ../libraries/AP_Swivel/AP_Swivel.cpp
     AP_SUBGROUPINFO(swivel, "SWIVEL", 58, ParametersG2, AP_Swivel),
+
+    // @Group: SPC
+    // @Path: ../libraries/AP_Swivel/AP_SwivelControl.cpp
+    AP_SUBGROUPINFO(swivel_control, "SPC", 59, ParametersG2, AP_SwivelControl),
 #endif
 
     AP_GROUPEND

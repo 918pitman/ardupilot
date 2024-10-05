@@ -11,6 +11,7 @@
 #include "AP_Gripper/AP_Gripper.h"
 #include <AP_Proximity/AP_Proximity.h>
 #include <AP_Swivel/AP_Swivel.h>
+#include <AP_Swivel/AP_SwivelControl.h>
 #include "AP_Rally.h"
 #include <AP_SmartRTL/AP_SmartRTL.h>
 #include <AP_Stats/AP_Stats.h>
@@ -344,6 +345,7 @@ public:
 
 #if AP_SWIVEL_ENABLED
     AP_Swivel swivel;
+    AP_SwivelControl swivel_control;
 #endif
 
 #if HAL_PROXIMITY_ENABLED

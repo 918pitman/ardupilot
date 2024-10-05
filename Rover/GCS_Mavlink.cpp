@@ -268,9 +268,9 @@ void GCS_MAVLINK_Rover::send_pid_tuning()
         }
     }
 
-    // sailboat heel to mainsail pid
+    // swivel control pid
     if (g.gcs_pid_mask & 32) {
-        pid_info = &g2.attitude_control.get_sailboat_heel_pid().get_pid_info();
+        pid_info = &g2.swivel_control.get_pid().get_pid_info();
         mavlink_msg_pid_tuning_send(chan, 9,
                                     pid_info->target,
                                     pid_info->actual,
