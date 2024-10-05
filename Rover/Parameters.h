@@ -322,6 +322,11 @@ public:
     AP_WheelEncoder wheel_encoder;
     AP_WheelRateControl wheel_rate_control;
 
+#if AP_SWIVEL_ENABLED
+    AP_Swivel swivel;
+    AP_SwivelControl swivel_control;
+#endif
+
     // Motor library
     AP_MotorsUGV motors;
 
@@ -342,11 +347,6 @@ public:
 
     // frame class for vehicle
     AP_Int8 frame_class;
-
-#if AP_SWIVEL_ENABLED
-    AP_Swivel swivel;
-    AP_SwivelControl swivel_control;
-#endif
 
 #if HAL_PROXIMITY_ENABLED
     // proximity library

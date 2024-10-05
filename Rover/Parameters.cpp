@@ -756,7 +756,7 @@ ParametersG2::ParametersG2(void)
 #if AP_BEACON_ENABLED
     beacon(),
 #endif
-    motors(wheel_rate_control),
+    motors(wheel_rate_control, swivel_control),
     wheel_rate_control(wheel_encoder),
     attitude_control(),
     smart_rtl(),
