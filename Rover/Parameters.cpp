@@ -765,6 +765,7 @@ ParametersG2::ParametersG2(void)
 #endif
 #if AP_SWIVEL_ENABLED
     swivel(),
+    swivel_control(swivel),
 #endif
 #if HAL_PROXIMITY_ENABLED
     proximity(),
