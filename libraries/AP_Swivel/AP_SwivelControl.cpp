@@ -110,7 +110,7 @@ const AP_Param::GroupInfo AP_SwivelControl::var_info[] = {
     // @Range: 1 8
     // @User: Advanced
 
-    AP_SUBGROUPINFO(_rate_pid, "_RATE_", 3, AP_SwivelControl, AC_PID)
+    AP_SUBGROUPINFO(_rate_pid, "_RATE_", 3, AP_SwivelControl, AC_PID),
 
     AP_GROUPEND
 };
