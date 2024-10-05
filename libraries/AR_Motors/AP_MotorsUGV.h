@@ -8,8 +8,7 @@
 class AP_MotorsUGV {
 public:
     // Constructor
-    AP_MotorsUGV(AP_WheelRateControl& rate_controller);
-    AP_MotorsUGV(AP_SwivelControl& swivel_controller);
+    AP_MotorsUGV(AP_WheelRateControl& rate_controller, AP_SwivelControl& swivel_controller);
 
     // singleton support
     static AP_MotorsUGV    *get_singleton(void) { return _singleton; }

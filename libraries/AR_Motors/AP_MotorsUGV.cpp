@@ -152,15 +152,8 @@ const AP_Param::GroupInfo AP_MotorsUGV::var_info[] = {
     AP_GROUPEND
 };
 
-AP_MotorsUGV::AP_MotorsUGV(AP_WheelRateControl& rate_controller) :
-    _rate_controller(rate_controller)
-{
-    AP_Param::setup_object_defaults(this, var_info);
-    _singleton = this;
-}
-
-AP_MotorsUGV::AP_MotorsUGV(AP_SwivelControl& swivel_controller) :
-    _swivel_controller(swivel_controller)
+AP_MotorsUGV::AP_MotorsUGV(AP_WheelRateControl& rate_controller, AP_SwivelControl& swivel_controller) :
+    _rate_controller(rate_controller), _swivel_controller(swivel_controller)
 {
     AP_Param::setup_object_defaults(this, var_info);
     _singleton = this;
