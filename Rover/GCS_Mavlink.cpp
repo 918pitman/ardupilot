@@ -129,8 +129,8 @@ void GCS_MAVLINK_Rover::send_servo_out()
         rover.g2.motors.get_throttle(),
         rover.g2.motors.get_swivel_steering(),
         rover.g2.motors.get_swivel_throttle(),
-        degrees(rover.g2.motors.get_swivel_angle()),
-        degrees(rover.g2.motors.get_swivel_error()),
+        degrees(rover.g2.motors.get_swivel_actual()),
+        degrees(rover.g2.motors.get_swivel_desired()),
         0,
         0,
         receiver_rssi());

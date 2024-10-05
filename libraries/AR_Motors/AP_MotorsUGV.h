@@ -2,12 +2,14 @@
 
 #include <AP_Arming/AP_Arming.h>
 #include <AP_WheelEncoder/AP_WheelRateControl.h>
+#include <AP_Swivel/AP_SwivelControl.h>
 #include <SRV_Channel/SRV_Channel.h>
 
 class AP_MotorsUGV {
 public:
     // Constructor
     AP_MotorsUGV(AP_WheelRateControl& rate_controller);
+    AP_MotorsUGV(AP_SwivelControl& rate_controller);
 
     // singleton support
     static AP_MotorsUGV    *get_singleton(void) { return _singleton; }
@@ -52,10 +54,10 @@ public:
     void set_throttle(float throttle);
 
     // get swivel state parameters
-    float get_swivel_steering() const { return _swivel_steering; }
     float get_swivel_throttle() const { return _swivel_throttle; }
-    float get_swivel_angle() const { return _swivel_angle; }
-    float get_swivel_error() const { return _swivel_error; }
+    float get_swivel_steering() const { return _swivel_steering; }
+    float get_swivel_actual() const { return _actual_swivel_angle; }
+    float get_swivel_desired() const { return _desired_swivel_angle; }
 
     // get or set roll as a value from -1 to 1
     float get_roll() const { return _roll; }
@@ -200,8 +202,12 @@ private:
     // use rate controller to achieve desired throttle
     float get_rate_controlled_throttle(SRV_Channel::Aux_servo_function_t function, float throttle, float dt);
 
+    // use rate controller to achieve desired swivel angle
+    float get_rate_controlled_swivel(float throttle, float dt);
+
     // external references
     AP_WheelRateControl &_rate_controller;
+    AP_SwivelControl &_swivel_controller;
 
     static const int8_t AP_MOTORS_NUM_MOTORS_MAX = 4;
 
@@ -225,10 +231,10 @@ private:
     // internal variables
     float   _steering;  // requested steering as a value from -4500 to +4500
     float   _throttle;  // requested throttle as a value from -100 to 100
-    float   _swivel_steering;    // requested swivel steering as a value from -4500 to +4500
-    float   _swivel_throttle;    // requested swivel throttle as a value from -100 to 100
-    float   _swivel_angle;       // current angle of the swivel in radians
-    float   _swivel_error;       // current error of the swivel in radians
+    float   _swivel_throttle;         // requested swivel throttle as a value from -100 to 100
+    float   _swivel_steering;
+    float   _actual_swivel_angle;     // current angle of the swivel in radians
+    float   _desired_swivel_angle;    // desired angle of the swivel in radians
     float   _throttle_prev; // throttle input from previous iteration
     bool    _scale_steering = true; // true if we should scale steering by speed or angle
     float   _lateral;  // requested lateral input as a value from -100 to +100

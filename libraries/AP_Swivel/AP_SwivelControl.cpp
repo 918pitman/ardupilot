@@ -133,7 +133,7 @@ bool AP_SwivelControl::enabled()
 }
 
 // get output in the range -100 to +100 given a desired rate expressed as a percentage of the rate_max (-100 to +100)
-float AP_SwivelControl::get_rate_controlled_throttle(float desired_rate_pct, float dt)
+float AP_SwivelControl::get_rate_controlled_swivel(float desired_rate, float dt)
 {
     if (!enabled()) {
         return 0;
@@ -149,8 +149,7 @@ float AP_SwivelControl::get_rate_controlled_throttle(float desired_rate_pct, flo
     }
     _last_update_ms = now;
 
-    // convert desired rate as a percentage to radians/sec
-    float desired_rate = desired_rate_pct * 0.01f * get_rate_max_rads();
+    desired_rate = constrain_float(desired_rate, -_rate_max, _rate_max);
 
     // get actual rate from swivel
     float actual_rate = 0; 

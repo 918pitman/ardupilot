@@ -28,7 +28,7 @@ public:
 
     // get throttle output in the range -100 to +100 given a desired rate expressed as a percentage of the rate_max (-100 to +100)
     // instance can be 0 or 1
-    float get_rate_controlled_throttle(float desired_rate_pct, float dt);
+    float get_rate_controlled_swivel(float desired_rate_pct, float dt);
 
     // get rate maximum in radians/sec
     float get_rate_max_rads() const { return MAX(_rate_max, 0.0f); }

@@ -159,6 +159,13 @@ AP_MotorsUGV::AP_MotorsUGV(AP_WheelRateControl& rate_controller) :
     _singleton = this;
 }
 
+AP_MotorsUGV::AP_MotorsUGV(AP_SwivelControl& swivel_controller) :
+    _swivel_controller(swivel_controller)
+{
+    AP_Param::setup_object_defaults(this, var_info);
+    _singleton = this;
+}
+
 void AP_MotorsUGV::init(uint8_t frtype)
 {
     _frame_type = frame_type(frtype);
@@ -356,11 +363,6 @@ void AP_MotorsUGV::output(bool armed, float ground_speed, float dt)
         _throttle = 0.0f;
     }
 
-    if (have_swivel_steering()) {
-        AP_Swivel *swivel = AP::swivel();
-        swivel->get_angle(_swivel_angle);
-    }
-
     // clear limit flags
     // output_ methods are responsible for setting them to true if required on each iteration
     limit.steer_left = limit.steer_right = limit.throttle_lower = limit.throttle_upper = false;
@@ -376,7 +378,28 @@ void AP_MotorsUGV::output(bool armed, float ground_speed, float dt)
 
     if (have_swivel_steering()) {
         // output for swivel steering style frames
-        output_skid_steering(armed, _swivel_steering, _swivel_throttle, dt);
+        AP_Swivel *swivel = AP::swivel();
+        swivel->get_angle(_actual_swivel_angle);
+        // Use current angle and desired angle to determine skid steer correction
+        float swivel_error = _actual_swivel_angle - _desired_swivel_angle;
+        float desired_rate = swivel_error * _swivel_str_gain;
+
+        _swivel_steering = get_rate_controlled_swivel(desired_rate, dt);
+        
+        float correction = constrain_float(desired_rate, -_swivel_str_max, _swivel_str_max);
+        correction *= 4500.0f;
+
+        // Use current angle and throttle to determine torque vector
+        float torque_vector = 0;
+        if(!is_zero(_actual_swivel_angle)) {
+            float turn_radius = _wheelbase / sinf(_actual_swivel_angle);
+            float torque_ratio = _trackwidth * 0.5 / turn_radius;
+            torque_vector = torque_ratio * _swivel_throttle * 0.01f * 4500.0f;
+        }
+        float steering = correction + torque_vector;
+
+        // send output to nested skid-steer mixer
+        output_skid_steering(armed, steering, _swivel_throttle, dt);
     } else {
         // output for skid steering style frames
         output_skid_steering(armed, _steering, _throttle, dt);
@@ -833,22 +856,8 @@ void AP_MotorsUGV::output_regular(bool armed, float ground_speed, float steering
     // always allow steering to move
     SRV_Channels::set_output_scaled(SRV_Channel::k_steering, steering);
 
-    // send output to nested skid-steer mixer
     if (have_swivel_steering()) {
-        // Use current angle and desired angle to determine skid steer correction
-        _swivel_error = _swivel_angle - steering * radians(constrain_float(_vector_angle_max, 0.0f, 90.0f)) / 4500.0f;
-        float correction = _swivel_error * _swivel_str_gain;
-        correction = constrain_float(correction, -_swivel_str_max, _swivel_str_max);
-        correction *= 4500.0f;
-
-        // Use current angle and throttle to determine torque vector
-        float torque_vector = 0;
-        if(!is_zero(_swivel_angle)) {
-            float turn_radius = _wheelbase / sinf(_swivel_angle);
-            float torque_ratio = _trackwidth * 0.5 / turn_radius;
-            torque_vector = torque_ratio * throttle * 0.01f * 4500.0f;
-        }
-        _swivel_steering = correction + torque_vector;
+        _desired_swivel_angle = steering * radians(constrain_float(_vector_angle_max, 0.0f, 90.0f)) / 4500.0f;
         _swivel_throttle = throttle;
     }
 }
@@ -1192,6 +1201,17 @@ float AP_MotorsUGV::get_rate_controlled_throttle(SRV_Channel::Aux_servo_function
 
     // return throttle unchanged
     return throttle;
+}
+
+// use rate controller to achieve desired swivel angle
+float AP_MotorsUGV::get_rate_controlled_swivel(float correction, float dt)
+{
+    // require non-zero dt and enabled
+    if (!is_positive(dt) || !_swivel_controller.enabled()) {
+        return correction;
+    }
+
+    return _swivel_controller.get_rate_controlled_swivel(correction, dt);
 }
 
 // return true if motors are moving
