@@ -54,7 +54,7 @@ public:
 
     // get swivel state parameters
     float get_swivel_throttle() const { return _swivel_throttle; }
-    float get_swivel_steering() const { return _swivel_steering * 1000; }
+    float get_swivel_steering() const { return _swivel_steering; }
     float get_swivel_actual() const { return _actual_swivel_angle; }
     float get_swivel_desired() const { return _desired_swivel_angle; }
 
