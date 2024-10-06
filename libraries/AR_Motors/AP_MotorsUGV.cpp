@@ -376,11 +376,8 @@ void AP_MotorsUGV::output(bool armed, float ground_speed, float dt)
         // Use current angle and desired angle to determine skid steer correction
         float swivel_error = _actual_swivel_angle - _desired_swivel_angle;
         float desired_rate = swivel_error * _swivel_str_gain;
-
-        _swivel_steering = get_rate_controlled_swivel(desired_rate, dt);
-        
-        float correction = constrain_float(desired_rate, -_swivel_str_max, _swivel_str_max);
-        correction *= 4500.0f;
+        float max_steer_correction = _swivel_str_max * 4500;
+        _swivel_steering = constrain_float(get_rate_controlled_swivel(desired_rate, dt), -max_steer_correction, max_steer_correction);
 
         // Use current angle and throttle to determine torque vector
         float torque_vector = 0;
@@ -389,7 +386,7 @@ void AP_MotorsUGV::output(bool armed, float ground_speed, float dt)
             float torque_ratio = _trackwidth * 0.5 / turn_radius;
             torque_vector = torque_ratio * _swivel_throttle * 0.01f * 4500.0f;
         }
-        float steering = correction + torque_vector;
+        float steering = _swivel_steering + torque_vector;
 
         // send output to nested skid-steer mixer
         output_skid_steering(armed, steering, _swivel_throttle, dt);
