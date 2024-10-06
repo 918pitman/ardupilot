@@ -7,7 +7,7 @@
 #include <AP_Swivel/AP_Swivel.h>
 
 // swivel rate control defaults
-#define AP_SWIVEL_RATE_MAX_DEFAULT   1.57f
+#define AP_SWIVEL_RATE_MAX_DEFAULT   45.0f
 #define AP_SWIVEL_RATE_CONTROL_FF    8.00f
 #define AP_SWIVEL_RATE_CONTROL_P     2.00f
 #define AP_SWIVEL_RATE_CONTROL_I     2.00f
@@ -45,7 +45,7 @@ private:
 
     // parameters
     AP_Int8         _enabled;   // top level enable/disable control
-    AP_Float        _rate_max;  // wheel maximum rotation rate in rad/s
+    AP_Float        _rate_max;  // wheel maximum rotation rate in degrees per second
     AC_PID          _rate_pid{AP_SWIVEL_RATE_CONTROL_P, AP_SWIVEL_RATE_CONTROL_I, AP_SWIVEL_RATE_CONTROL_D, AP_SWIVEL_RATE_CONTROL_FF, AP_SWIVEL_RATE_CONTROL_IMAX, AP_SWIVEL_RATE_CONTROL_FILT, AP_SWIVEL_RATE_CONTROL_FILT, AP_SWIVEL_RATE_CONTROL_FILT, AP_SWIVEL_RATE_CONTROL_DT};
 
     // limit flags

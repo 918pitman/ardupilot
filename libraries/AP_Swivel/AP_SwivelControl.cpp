@@ -13,7 +13,7 @@ const AP_Param::GroupInfo AP_SwivelControl::var_info[] = {
     // @Param: _RATE_MAX
     // @DisplayName: Wheel max rotation rate
     // @Description: Wheel max rotation rate
-    // @Units: rad/s
+    // @Units: deg/s
     // @Range: 0 200
     // @User: Standard
     AP_GROUPINFO("_RATE_MAX", 2, AP_SwivelControl, _rate_max, AP_SWIVEL_RATE_MAX_DEFAULT),
@@ -156,7 +156,7 @@ float AP_SwivelControl::get_rate_controlled_swivel(float desired_rate, float dt)
     _swivel.get_rate(actual_rate);
 
     // constrain and set limit flags
-    float output = _rate_pid.update_all(desired_rate, actual_rate, dt, (_limit.lower || _limit.upper));
+    float output = _rate_pid.update_all(degrees(desired_rate), degrees(actual_rate), dt, (_limit.lower || _limit.upper));
     output += _rate_pid.get_ff();
 
     // set limits for next iteration
