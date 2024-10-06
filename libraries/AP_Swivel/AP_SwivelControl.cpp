@@ -149,14 +149,14 @@ float AP_SwivelControl::get_rate_controlled_swivel(float desired_rate, float dt)
     }
     _last_update_ms = now;
 
-    desired_rate = constrain_float(desired_rate, -_rate_max, _rate_max);
+    desired_rate = constrain_float(degrees(desired_rate), -_rate_max, _rate_max);
 
     // get actual rate from swivel
     float actual_rate = 0; 
     _swivel.get_rate(actual_rate);
 
     // constrain and set limit flags
-    float output = _rate_pid.update_all(degrees(desired_rate), degrees(actual_rate), dt, (_limit.lower || _limit.upper));
+    float output = _rate_pid.update_all(desired_rate, degrees(actual_rate), dt, (_limit.lower || _limit.upper));
     output += _rate_pid.get_ff();
 
     // set limits for next iteration
