@@ -386,7 +386,7 @@ void AP_MotorsUGV::output(bool armed, float ground_speed, float dt)
             float torque_ratio = _trackwidth * 0.5 / turn_radius;
             torque_vector = torque_ratio * _swivel_throttle * 0.01f * 4500.0f;
         }
-        float steering = _swivel_steering + torque_vector;
+        float steering = _swivel_steering * -1 + torque_vector;
 
         // send output to nested skid-steer mixer
         output_skid_steering(armed, steering, _swivel_throttle, dt);
