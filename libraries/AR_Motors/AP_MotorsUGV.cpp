@@ -374,7 +374,7 @@ void AP_MotorsUGV::output(bool armed, float ground_speed, float dt)
         AP_Swivel *swivel = AP::swivel();
         swivel->get_angle(_actual_swivel_angle);
         // Use current angle and desired angle to determine skid steer correction
-        float swivel_error = _actual_swivel_angle - _desired_swivel_angle;
+        float swivel_error = _desired_swivel_angle - _actual_swivel_angle;
         float desired_rate = swivel_error * _swivel_str_gain;
         float max_steer_correction = _swivel_str_max * 4500;
         _swivel_steering = constrain_float(get_rate_controlled_swivel(desired_rate, dt), -max_steer_correction, max_steer_correction);
