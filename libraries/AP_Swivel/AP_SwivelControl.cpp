@@ -160,8 +160,8 @@ float AP_SwivelControl::get_rate_controlled_swivel(float desired_rate, float dt)
     output += _rate_pid.get_ff();
 
     // set limits for next iteration
-    _limit.upper = output >= 100.0f;
-    _limit.lower = output <= -100.0f;
+    _limit.upper = output >= 200.0f;
+    _limit.lower = output <= -200.0f;
 
     return output;
 }
