@@ -24,7 +24,7 @@ const AP_Param::GroupInfo AP_SwivelControl::var_info[] = {
     // @Units: meters
     // @Range: 0 1.0
     // @User: Advanced
-    AP_GROUPINFO("_WHL_BASE", 3, AP_SwivelControl, _trackwidth, AP_SWIVEL_TRACKWIDTH),
+    AP_GROUPINFO("_WHL_DIST", 3, AP_SwivelControl, _trackwidth, AP_SWIVEL_TRACKWIDTH),
 
     // @Param: _POS_P
     // @DisplayName: Swivel Steer Gain
