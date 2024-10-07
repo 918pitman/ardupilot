@@ -119,36 +119,6 @@ const AP_Param::GroupInfo AP_MotorsUGV::var_info[] = {
     // @User: Advanced
     AP_GROUPINFO("THST_ASYM", 14, AP_MotorsUGV, _thrust_asymmetry, 1.0f),
 
-    // @Param: WHEELBASE
-    // @DisplayName: Distance between front and back axles
-    // @Description: Distance between front and back axles, needed for torque vector calculations
-    // @Units: meters
-    // @Range: 0.1 10.0
-    // @User: Advanced
-    AP_GROUPINFO("WHEELBASE", 15, AP_MotorsUGV, _wheelbase, 0.775f),
-
-    // @Param: TRACKWIDTH
-    // @DisplayName: Distance between left and right drive wheels
-    // @Description: Distance between left and right drive wheels, needed for torque vector calculations
-    // @Units: meters
-    // @Range: 0.1 10.0
-    // @User: Advanced
-    AP_GROUPINFO("TRACKWIDTH", 16, AP_MotorsUGV, _trackwidth, 0.4f),
-
-    // @Param: STR_CRTN_P
-    // @DisplayName: Swivel Steer Gain
-    // @Description: Translates Swivel angle error into steering input for skid-steer mixer.
-    // @Range: 0 1.0
-    // @User: Advanced
-    AP_GROUPINFO("STR_CRTN_P", 17, AP_MotorsUGV, _swivel_str_gain, 0.25f),
-
-    // @Param: STR_CRTN_MAX
-    // @DisplayName: Max steering input into skid-steer mixer allowed for Swivel angle corrections
-    // @Description:
-    // @Range: 0 1.0
-    // @User: Advanced
-    AP_GROUPINFO("STR_CRTN_MAX", 18, AP_MotorsUGV, _swivel_str_max, 0.25f),
-
     AP_GROUPEND
 };
 
@@ -373,23 +343,10 @@ void AP_MotorsUGV::output(bool armed, float ground_speed, float dt)
         // output for swivel steering style frames
         AP_Swivel *swivel = AP::swivel();
         swivel->get_angle(_actual_swivel_angle);
-        // Use current angle and desired angle to determine skid steer correction
-        float swivel_error = _desired_swivel_angle - _actual_swivel_angle;
-        float desired_rate = swivel_error * _swivel_str_gain;
-        float max_steer_correction = _swivel_str_max * 4500;
-        _swivel_steering = constrain_float(get_rate_controlled_swivel(desired_rate, dt), -max_steer_correction, max_steer_correction);
-
-        // Use current angle and throttle to determine torque vector
-        float torque_vector = 0;
-        if(!is_zero(_actual_swivel_angle)) {
-            float turn_radius = _wheelbase / sinf(_actual_swivel_angle);
-            float torque_ratio = _trackwidth * 0.5 / turn_radius;
-            torque_vector = torque_ratio * _swivel_throttle * 0.01f * 4500.0f;
-        }
-        float steering = _swivel_steering * -1 + torque_vector;
-
+        // Get the correction required to achieve desired angle
+        _swivel_steering = get_swivel_position_correction(_desired_swivel_angle, _swivel_throttle, dt);
         // send output to nested skid-steer mixer
-        output_skid_steering(armed, steering, _swivel_throttle, dt);
+        output_skid_steering(armed, _swivel_steering, _swivel_throttle, dt);
     } else {
         // output for skid steering style frames
         output_skid_steering(armed, _steering, _throttle, dt);
@@ -1194,14 +1151,14 @@ float AP_MotorsUGV::get_rate_controlled_throttle(SRV_Channel::Aux_servo_function
 }
 
 // use rate controller to achieve desired swivel angle
-float AP_MotorsUGV::get_rate_controlled_swivel(float correction, float dt)
+float AP_MotorsUGV::get_swivel_position_correction(float target, float throttle, float dt)
 {
     // require non-zero dt and enabled
     if (!is_positive(dt) || !_swivel_controller.enabled()) {
-        return correction;
+        return target;
     }
 
-    return _swivel_controller.get_rate_controlled_swivel(correction, dt);
+    return _swivel_controller.get_swivel_position_correction(target, throttle, dt);
 }
 
 // return true if motors are moving
