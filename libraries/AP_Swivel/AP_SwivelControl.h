@@ -20,18 +20,18 @@
 #define AP_SWIVEL_POS_FF             0.00f
 #define AP_SWIVEL_POS_IMAX           1.00f
 #define AP_SWIVEL_POS_FILT           0.00f
-#define AP_SWIVEL_POS_DT             0.02f
+#define AP_SWIVEL_POS_DT             0.00f
 
 // swivel rate control defaults
 #define AP_SWIVEL_PWM_MAX            0.50f
 #define AP_SWIVEL_RATE_MAX           90.0f
 #define AP_SWIVEL_RATE_P             2.00f
 #define AP_SWIVEL_RATE_I             2.00f
-#define AP_SWIVEL_RATE_D             0.01f
+#define AP_SWIVEL_RATE_D             0.00f
 #define AP_SWIVEL_RATE_FF            6.00f
 #define AP_SWIVEL_RATE_IMAX          1.00f
 #define AP_SWIVEL_RATE_FILT          0.00f
-#define AP_SWIVEL_RATE_DT            0.02f
+#define AP_SWIVEL_RATE_DT            0.00f
 
 class AP_SwivelControl {
 
