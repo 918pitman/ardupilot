@@ -26,19 +26,106 @@ const AP_Param::GroupInfo AP_SwivelControl::var_info[] = {
     // @User: Advanced
     AP_GROUPINFO("_WHL_DIST", 3, AP_SwivelControl, _trackwidth, AP_SWIVEL_TRACKWIDTH),
 
+    // @Param: _POS_FF
+    // @DisplayName: Swivel position control feed forward gain
+    // @Description: Swivel position control feed forward gain.
+    // @Range: 0.100 2.000
+    // @User: Standard
+
     // @Param: _POS_P
-    // @DisplayName: Swivel Steer Gain
-    // @Description: Translates Swivel angle error into steering input for skid-steer mixer.
-    // @Range: 0 1.0
+    // @DisplayName: Swivel position control P gain
+    // @Description: Swivel position control P gain.  Converts position error to output rate
+    // @Range: 0.100 2.000
+    // @User: Standard
+
+    // @Param: _POS_I
+    // @DisplayName: Swivel position control I gain
+    // @Description: Swivel position control I gain.  Corrects long term error between the desired position and actual
+    // @Range: 0.000 2.000
+    // @User: Standard
+
+    // @Param: _POS_IMAX
+    // @DisplayName: Swivel position control I gain maximum
+    // @Description: Swivel position control I gain maximum.  Constrains the output (range -1 to +1) that the I term will generate
+    // @Range: 0.000 1.000
+    // @User: Standard
+
+    // @Param: _POS_D
+    // @DisplayName: Swivel position control D gain
+    // @Description: Swivel position control D gain.  Compensates for short-term change in desired position vs actual
+    // @Range: 0.000 0.400
+    // @User: Standard
+
+    // @Param: _POS_FILT
+    // @DisplayName: Swivel position control filter frequency
+    // @Description: Swivel position control input filter.  Lower values reduce noise but add delay.
+    // @Range: 1.000 100.000
+    // @Units: Hz
+    // @User: Standard
+
+    // @Param: _POS_FLTT
+    // @DisplayName: Swivel position control target frequency in Hz
+    // @Description: Swivel position control target frequency in Hz
+    // @Range: 1 50
+    // @Increment: 1
+    // @Units: Hz
+    // @User: Standard
+
+    // @Param: _POS_FLTE
+    // @DisplayName: Swivel position control error frequency in Hz
+    // @Description: Swivel position control error frequency in Hz
+    // @Range: 1 50
+    // @Increment: 1
+    // @Units: Hz
+    // @User: Standard
+
+    // @Param: _POS_FLTD
+    // @DisplayName: Swivel position control derivative frequency in Hz
+    // @Description: Swivel position control derivative frequency in Hz
+    // @Range: 1 50
+    // @Increment: 1
+    // @Units: Hz
+    // @User: Standard
+
+    // @Param: _POS_SMAX
+    // @DisplayName: Swivel position slew rate limit
+    // @Description: Sets an upper limit on the slew rate produced by the combined P and D gains. If the amplitude of the control action produced by the rate feedback exceeds this value, then the D+P gain is reduced to respect the limit. This limits the amplitude of high frequency oscillations caused by an excessive gain. The limit should be set to no more than 25% of the actuators maximum slew rate to allow for load effects. Note: The gain will not be reduced to less than 10% of the nominal value. A value of zero will disable this feature.
+    // @Range: 0 200
+    // @Increment: 0.5
     // @User: Advanced
-    AP_GROUPINFO("_POS_P", 4, AP_SwivelControl, _pos_p, AP_SWIVEL_POS_CONTROL_P),
+
+    // @Param: _POS_PDMX
+    // @DisplayName: Swivel position control PD sum maximum
+    // @Description: Swivel position control PD sum maximum.  The maximum/minimum value that the sum of the P and D term can output
+    // @Range: 0.000 1.000
+
+    // @Param: _POS_D_FF
+    // @DisplayName: Swivel position Derivative FeedForward Gain
+    // @Description: FF D Gain which produces an output that is proportional to the rate of change of the error
+    // @Range: 0.000 0.400
+    // @Increment: 0.001
+    // @User: Advanced
+
+    // @Param: _POS_NTF
+    // @DisplayName: Swivel position Target notch filter index
+    // @Description: Swivel position Target notch filter index
+    // @Range: 1 8
+    // @User: Advanced
+
+    // @Param: _POS_NEF
+    // @DisplayName: Swivel position Error notch filter index
+    // @Description: Swivel position Error notch filter index
+    // @Range: 1 8
+    // @User: Advanced
+
+    AP_SUBGROUPINFO(_pos_pid, "_POS_", 4, AP_SwivelControl, AC_PID),
 
     // @Param: _PWM_MAX
     // @DisplayName: Swivel max steering output allowed for correcting angle
     // @Description: Swivel max steering output allowed for correcting angle
     // @Range: 0 1.0
     // @User: Advanced
-    AP_GROUPINFO("_PWM_MAX", 5, AP_SwivelControl, _pwm_max, AP_SWIVEL_PWM_MAX_DEFAULT),
+    AP_GROUPINFO("_PWM_MAX", 5, AP_SwivelControl, _pwm_max, AP_SWIVEL_PWM_MAX),
 
     // @Param: _RATE_MAX
     // @DisplayName: Swivel max rotation rate
@@ -46,7 +133,7 @@ const AP_Param::GroupInfo AP_SwivelControl::var_info[] = {
     // @Units: deg/s
     // @Range: 0 200
     // @User: Standard
-    AP_GROUPINFO("_RATE_MAX", 6, AP_SwivelControl, _rate_max, AP_SWIVEL_RATE_MAX_DEFAULT),
+    AP_GROUPINFO("_RATE_MAX", 6, AP_SwivelControl, _rate_max, AP_SWIVEL_RATE_MAX),
 
     // @Param: _RATE_FF
     // @DisplayName: Swivel rate control feed forward gain
@@ -163,7 +250,7 @@ bool AP_SwivelControl::enabled()
 }
 
 // get steering output for correcting the swivel angle using rate control.
-float AP_SwivelControl::get_swivel_position_correction(float target, float throttle, float dt)
+float AP_SwivelControl::get_swivel_position_correction(float desired_angle, float throttle, float dt)
 {
     if (!enabled()) {
         return 0;
@@ -171,27 +258,38 @@ float AP_SwivelControl::get_swivel_position_correction(float target, float throt
 
     // check for timeout
     uint32_t now = AP_HAL::millis();
-    if (now - _last_update_ms > AP_SWIVEL_RATE_CONTROL_TIMEOUT_MS) {
+    if (now - _last_update_ms > AP_SWIVEL_TIMEOUT_MS) {
+        _pos_pid.reset_filter();
+        _pos_pid.reset_I();
         _rate_pid.reset_filter();
         _rate_pid.reset_I();
-        _limit.lower = false;
-        _limit.upper = false;
+        _rate_limit.lower = false;
+        _rate_limit.upper = false;
+        _pwm_limit.lower = false;
+        _pwm_limit.upper = false;
     }
     _last_update_ms = now;
 
-    // get actual angel and rate from swivel
+    // get current angel and rate from swivel
     float current_angle = 0;
-    float actual_rate = 0; 
+    float current_rate = 0; 
     _swivel.get_angle(current_angle);
-    _swivel.get_rate(actual_rate);
+    _swivel.get_rate(current_rate);
+    current_angle = degrees(current_angle);
+    current_rate = degrees(current_rate);
 
-    float swivel_error = target - current_angle;
-    float desired_rate = swivel_error * _pos_p;
+    // get desired rate using position PID
+    float desired_rate = _pos_pid.update_all(desired_angle, current_angle, dt, (_rate_limit.lower || _rate_limit.upper));
+    desired_rate += _pos_pid.get_ff();
 
-    desired_rate = constrain_float(degrees(desired_rate), -_rate_max, _rate_max);
+    // set limits for next iteration
+    _rate_limit.upper = desired_rate >= _rate_max;
+    _rate_limit.lower = desired_rate <= -_rate_max;
 
-    // constrain and set limit flags
-    float output = _rate_pid.update_all(desired_rate, degrees(actual_rate), dt, (_limit.lower || _limit.upper));
+    desired_rate = constrain_float(desired_rate, -_rate_max, _rate_max);
+
+    // get desired pwm using rate PID
+    float output = _rate_pid.update_all(desired_rate, current_rate, dt, (_pwm_limit.lower || _pwm_limit.upper));
     output += _rate_pid.get_ff();
 
     // Temporary fix for flipped output
@@ -207,18 +305,21 @@ float AP_SwivelControl::get_swivel_position_correction(float target, float throt
     output += torque_vector;
 
     // set limits for next iteration
-    _limit.upper = output >= _pwm_max * 4500.0f;
-    _limit.lower = output <= _pwm_max * -4500.0f;
+    _pwm_limit.upper = output >= _pwm_max * 4500.0f;
+    _pwm_limit.lower = output <= _pwm_max * -4500.0f;
 
     return output;
 }
 
 // get pid objects for reporting
-AC_PID& AP_SwivelControl::get_pid() { return _rate_pid; }
+AC_PID& AP_SwivelControl::get_pos_pid() { return _pos_pid; }
+
+AC_PID& AP_SwivelControl::get_rate_pid() { return _rate_pid; }
 
 void AP_SwivelControl::set_notch_sample_rate(float sample_rate)
 {
 #if AP_FILTER_ENABLED
+    _pos_pid.set_notch_sample_rate(sample_rate);
     _rate_pid.set_notch_sample_rate(sample_rate);
 #endif
 }

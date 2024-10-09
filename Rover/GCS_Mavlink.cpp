@@ -234,9 +234,9 @@ void GCS_MAVLINK_Rover::send_pid_tuning()
         }
     }
 
-    // left wheel rate control pid
+    // swivel position control pid
     if (g.gcs_pid_mask & 8) {
-        pid_info = &g2.wheel_rate_control.get_pid(0).get_pid_info();
+        pid_info = &g2.swivel_control.get_pos_pid().get_pid_info();
         mavlink_msg_pid_tuning_send(chan, 7,
                                     pid_info->target,
                                     pid_info->actual,
@@ -251,9 +251,9 @@ void GCS_MAVLINK_Rover::send_pid_tuning()
         }
     }
 
-    // right wheel rate control pid
+    // swivel rate control pid
     if (g.gcs_pid_mask & 16) {
-        pid_info = &g2.wheel_rate_control.get_pid(1).get_pid_info();
+        pid_info = &g2.swivel_control.get_rate_pid().get_pid_info();
         mavlink_msg_pid_tuning_send(chan, 8,
                                     pid_info->target,
                                     pid_info->actual,
@@ -268,9 +268,9 @@ void GCS_MAVLINK_Rover::send_pid_tuning()
         }
     }
 
-    // swivel control pid
+    // sailboat heel to mainsail pid
     if (g.gcs_pid_mask & 32) {
-        pid_info = &g2.swivel_control.get_pid().get_pid_info();
+        pid_info = &g2.attitude_control.get_sailboat_heel_pid().get_pid_info();
         mavlink_msg_pid_tuning_send(chan, 9,
                                     pid_info->target,
                                     pid_info->actual,
