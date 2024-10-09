@@ -48,6 +48,9 @@ public:
     // get rate maximum in radians/sec
     float get_rate_max_rads() const { return MAX(_rate_max, 0.0f); }
 
+    // get limit flag
+    bool is_limited() const { return _rate_limit || _pwm_limit; }
+
     // get pid object for reporting
     AC_PID& get_pos_pid();
     AC_PID& get_rate_pid();
@@ -70,10 +73,7 @@ private:
     AC_PID          _rate_pid{AP_SWIVEL_RATE_P, AP_SWIVEL_RATE_I, AP_SWIVEL_RATE_D, AP_SWIVEL_RATE_FF, AP_SWIVEL_RATE_IMAX, AP_SWIVEL_RATE_FILT, AP_SWIVEL_RATE_FILT, AP_SWIVEL_RATE_FILT, AP_SWIVEL_RATE_DT};
 
     // limit flags
-    struct AP_MotorsUGV_limit {
-        bool    lower;  // reached this instance's lower limit on last iteration
-        bool    upper;  // reached this instance's upper limit on last iteration
-    } _rate_limit, _pwm_limit;
+    bool _rate_limit, _pwm_limit;
 
     // internal variables
     const AP_Swivel&        _swivel;     // pointer to accompanying swivel

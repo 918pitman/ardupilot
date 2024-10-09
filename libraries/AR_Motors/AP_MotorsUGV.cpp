@@ -344,7 +344,10 @@ void AP_MotorsUGV::output(bool armed, float ground_speed, float dt)
         AP_Swivel *swivel = AP::swivel();
         swivel->get_angle(_actual_swivel_angle);
         // Get the correction required to achieve desired angle
-        _swivel_steering = get_swivel_position_correction(_desired_swivel_angle, _swivel_throttle, dt);
+        _swivel_steering = _swivel_controller.get_swivel_position_correction(_desired_swivel_angle, _swivel_throttle, dt);
+        limit.steer_left |= _swivel_controller.is_limited();
+        limit.steer_right |= _swivel_controller.is_limited();
+
         // send output to nested skid-steer mixer
         output_skid_steering(armed, _swivel_steering, _swivel_throttle, dt);
     } else {
@@ -1148,17 +1151,6 @@ float AP_MotorsUGV::get_rate_controlled_throttle(SRV_Channel::Aux_servo_function
 
     // return throttle unchanged
     return throttle;
-}
-
-// use rate controller to achieve desired swivel angle
-float AP_MotorsUGV::get_swivel_position_correction(float target, float throttle, float dt)
-{
-    // require non-zero dt and enabled
-    if (!is_positive(dt) || !_swivel_controller.enabled()) {
-        return target;
-    }
-
-    return _swivel_controller.get_swivel_position_correction(target, throttle, dt);
 }
 
 // return true if motors are moving

@@ -263,10 +263,8 @@ float AP_SwivelControl::get_swivel_position_correction(float desired_angle, floa
         _pos_pid.reset_I();
         _rate_pid.reset_filter();
         _rate_pid.reset_I();
-        _rate_limit.lower = false;
-        _rate_limit.upper = false;
-        _pwm_limit.lower = false;
-        _pwm_limit.upper = false;
+        _rate_limit = false;
+        _pwm_limit = false;
     }
     _last_update_ms = now;
 
@@ -279,17 +277,16 @@ float AP_SwivelControl::get_swivel_position_correction(float desired_angle, floa
     current_rate = degrees(current_rate);
 
     // get desired rate using position PID
-    float desired_rate = _pos_pid.update_all(desired_angle, current_angle, dt, (_rate_limit.lower || _rate_limit.upper));
+    float desired_rate = _pos_pid.update_all(desired_angle, current_angle, dt, _rate_limit);
     desired_rate += _pos_pid.get_ff();
 
     // set limits for next iteration
-    _rate_limit.upper = desired_rate >= _rate_max;
-    _rate_limit.lower = desired_rate <= -_rate_max;
+    _rate_limit = fabsf(desired_rate) >= _rate_max;
 
     desired_rate = constrain_float(desired_rate, -_rate_max, _rate_max);
 
     // get desired pwm using rate PID
-    float output = _rate_pid.update_all(desired_rate, current_rate, dt, (_pwm_limit.lower || _pwm_limit.upper));
+    float output = _rate_pid.update_all(desired_rate, current_rate, dt, _pwm_limit);
     output += _rate_pid.get_ff();
 
     // Temporary fix for flipped output
@@ -305,8 +302,7 @@ float AP_SwivelControl::get_swivel_position_correction(float desired_angle, floa
     output += torque_vector;
 
     // set limits for next iteration
-    _pwm_limit.upper = output >= _pwm_max * 4500.0f;
-    _pwm_limit.lower = output <= _pwm_max * -4500.0f;
+    _pwm_limit = fabsf(output) >= _pwm_max * 4500.0f;
 
     return output;
 }
