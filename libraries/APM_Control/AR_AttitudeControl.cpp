@@ -793,7 +793,7 @@ float AR_AttitudeControl::get_throttle_out_speed(float desired_speed, bool motor
     _throttle_limit_high = false;
 
     // protect against reverse output being sent to the motors unless braking has been enabled
-    if (!_brake_enable || (fabsf(_desired_speed) <= fabsf(_stop_speed))) {
+    if (!_brake_enable) {
         // if both desired speed and actual speed are positive, do not allow negative values
         if ((_desired_speed >= 0.0f) && (throttle_out <= 0.0f)) {
             throttle_out = 0.0f;
