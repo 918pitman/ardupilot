@@ -345,9 +345,9 @@ void AP_MotorsUGV::output(bool armed, float ground_speed, float dt)
         swivel->get_angle(_actual_swivel_angle);
         // Get the correction required to achieve desired angle
         _swivel_steering = _swivel_controller.get_swivel_position_correction(_desired_swivel_angle, _swivel_throttle, dt);
-        limit.steer_left |= _swivel_controller.is_limited();
-        limit.steer_right |= _swivel_controller.is_limited();
-
+        if (_swivel_controller.is_limited()) {
+            limit.steer_left = limit.steer_right = limit.throttle_lower = limit.throttle_upper = true;
+        }
         // send output to nested skid-steer mixer
         output_skid_steering(armed, _swivel_steering, _swivel_throttle, dt);
     } else {

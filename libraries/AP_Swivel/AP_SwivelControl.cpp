@@ -26,6 +26,14 @@ const AP_Param::GroupInfo AP_SwivelControl::var_info[] = {
     // @User: Advanced
     AP_GROUPINFO("_WHL_DIST", 3, AP_SwivelControl, _trackwidth, AP_SWIVEL_TRACKWIDTH),
 
+    // @Param: _LIMIT
+    // @DisplayName: Swivel Steer Error threshold
+    // @Description: Angle error threshold before limiting position I term
+    // @Units: degrees
+    // @Range: 0 45.0
+    // @User: Advanced
+    AP_GROUPINFO("_LIMIT", 4, AP_SwivelControl, _error_limit, 10),
+
     // @Param: _POS_FF
     // @DisplayName: Swivel position control feed forward gain
     // @Description: Swivel position control feed forward gain.
@@ -118,14 +126,14 @@ const AP_Param::GroupInfo AP_SwivelControl::var_info[] = {
     // @Range: 1 8
     // @User: Advanced
 
-    AP_SUBGROUPINFO(_pos_pid, "_POS_", 4, AP_SwivelControl, AC_PID),
+    AP_SUBGROUPINFO(_pos_pid, "_POS_", 5, AP_SwivelControl, AC_PID),
 
     // @Param: _PWM_MAX
     // @DisplayName: Swivel max steering output allowed for correcting angle
     // @Description: Swivel max steering output allowed for correcting angle
     // @Range: 0 1.0
     // @User: Advanced
-    AP_GROUPINFO("_PWM_MAX", 5, AP_SwivelControl, _pwm_max, AP_SWIVEL_PWM_MAX),
+    AP_GROUPINFO("_PWM_MAX", 6, AP_SwivelControl, _pwm_max, AP_SWIVEL_PWM_MAX),
 
     // @Param: _RATE_MAX
     // @DisplayName: Swivel max rotation rate
@@ -133,7 +141,7 @@ const AP_Param::GroupInfo AP_SwivelControl::var_info[] = {
     // @Units: deg/s
     // @Range: 0 200
     // @User: Standard
-    AP_GROUPINFO("_RATE_MAX", 6, AP_SwivelControl, _rate_max, AP_SWIVEL_RATE_MAX),
+    AP_GROUPINFO("_RATE_MAX", 7, AP_SwivelControl, _rate_max, AP_SWIVEL_RATE_MAX),
 
     // @Param: _RATE_FF
     // @DisplayName: Swivel rate control feed forward gain
@@ -227,7 +235,7 @@ const AP_Param::GroupInfo AP_SwivelControl::var_info[] = {
     // @Range: 1 8
     // @User: Advanced
 
-    AP_SUBGROUPINFO(_rate_pid, "_RATE_", 7, AP_SwivelControl, AC_PID),
+    AP_SUBGROUPINFO(_rate_pid, "_RATE_", 8, AP_SwivelControl, AC_PID),
 
     AP_GROUPEND
 };
@@ -275,11 +283,11 @@ float AP_SwivelControl::get_swivel_position_correction(float desired_angle, floa
     _swivel.get_rate(current_rate);
 
     // get desired rate using position PID
-    float desired_rate = _pos_pid.update_all(degrees(desired_angle), degrees(current_angle), dt, _pwm_limit);
+    float desired_rate = _pos_pid.update_all(degrees(desired_angle), degrees(current_angle), dt, _rate_limit);
     desired_rate += _pos_pid.get_ff();
 
     // set limits for next iteration
-    _rate_limit = fabsf(desired_rate) >= _rate_max;
+    _rate_limit = fabsf(_pos_pid.get_pid_info().error) >= _rate_max;
 
     desired_rate = constrain_float(desired_rate, -_rate_max, _rate_max);
 

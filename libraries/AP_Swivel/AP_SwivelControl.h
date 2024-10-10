@@ -63,12 +63,12 @@ public:
 private:
 
     // parameters
-    AP_Int8         _enabled;    // Swivel rate control enable/disable
-    AP_Float        _wheelbase;  // Distance between Swivel and vehicle's center of rotation
-    AP_Float        _trackwidth; // Distance between Swivel's wheels
-    AP_Float        _pos_p;      // Angle position error to angular rate gain
-    AP_Float        _pwm_max;    // Swivel max steering output allowed for correcting angle
-    AP_Float        _rate_max;   // Swivel max rotation rate
+    AP_Int8         _enabled;     // Swivel rate control enable/disable
+    AP_Float        _wheelbase;   // Distance between Swivel and vehicle's center of rotation
+    AP_Float        _trackwidth;  // Distance between Swivel's wheels
+    AP_Float        _error_limit; // Angle error threshold to set limit flag
+    AP_Float        _pwm_max;     // Swivel max steering output allowed for correcting angle
+    AP_Float        _rate_max;    // Swivel max rotation rate
     AC_PID          _pos_pid{AP_SWIVEL_POS_P, AP_SWIVEL_POS_I, AP_SWIVEL_POS_D, AP_SWIVEL_POS_FF, AP_SWIVEL_POS_IMAX, AP_SWIVEL_POS_FILT, AP_SWIVEL_POS_FILT, AP_SWIVEL_POS_FILT, AP_SWIVEL_POS_DT};
     AC_PID          _rate_pid{AP_SWIVEL_RATE_P, AP_SWIVEL_RATE_I, AP_SWIVEL_RATE_D, AP_SWIVEL_RATE_FF, AP_SWIVEL_RATE_IMAX, AP_SWIVEL_RATE_FILT, AP_SWIVEL_RATE_FILT, AP_SWIVEL_RATE_FILT, AP_SWIVEL_RATE_DT};
 
