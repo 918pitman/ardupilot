@@ -15,12 +15,5 @@ void ModeHold::update()
 
     // hold position - stop motors and center steering
     g2.motors.set_throttle(throttle);
-
-    float steering = 0.0f;
-
-    if (g2.motors.have_swivel_steering()) {
-        steering = is_positive(g2.motors.get_swivel_actual()) ? 4500.0f : -4500.0f;
-    }
-
-    g2.motors.set_steering(steering, false);
+    g2.motors.set_steering(0.0f);
 }
