@@ -287,7 +287,7 @@ float AP_SwivelControl::get_swivel_position_correction(float desired_angle, floa
     desired_rate += _pos_pid.get_ff();
 
     // set limits for next iteration
-    _rate_limit = fabsf(_pos_pid.get_pid_info().error) >= _rate_max;
+    _rate_limit = fabsf(_pos_pid.get_pid_info().error) >= _error_limit;
 
     desired_rate = constrain_float(desired_rate, -_rate_max, _rate_max);
 
