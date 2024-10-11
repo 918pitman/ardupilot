@@ -721,7 +721,7 @@ void AP_MotorsUGV::output_regular(bool armed, float ground_speed, float steering
         // normalise desired steering and throttle to ease calculations
         float steering_norm = steering / 4500.0f;
         float throttle_norm = throttle * 0.01f;
-        float throttle_sign = is_positive(throttle_norm) ? 1.0f : -1.0f
+        float throttle_sign = is_positive(throttle_norm) ? 1.0f : -1.0f;
         const float vector_angle_max_rad = radians(constrain_float(_vector_angle_max, 0.0f, 90.0f));
 
         // get magnitude of throttle and steering components (thrust)
