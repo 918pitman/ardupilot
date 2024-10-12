@@ -718,45 +718,51 @@ void AP_MotorsUGV::output_regular(bool armed, float ground_speed, float steering
 {
     // output to throttle channels
     if (armed) {
-        // normalise desired steering and throttle to ease calculations
-        float steering_norm = steering / 4500.0f;
-        float throttle_norm = throttle * 0.01f;
-        float throttle_sign = is_positive(throttle_norm) ? 1.0f : -1.0f;
         const float vector_angle_max_rad = radians(constrain_float(_vector_angle_max, 0.0f, 90.0f));
+        if (_scale_steering) {
+            // normalise desired steering and throttle to ease calculations
+            float steering_norm = steering / 4500.0f;
+            float throttle_norm = throttle * 0.01f;
+            float throttle_sign = is_positive(throttle_norm) ? 1.0f : -1.0f;
 
-        // get magnitude of throttle and steering components (thrust)
-        float magnitude = sqrtf(sq(steering_norm) + sq(throttle_norm));
+            // get magnitude of throttle and steering components (thrust)
+            float magnitude = sqrtf(sq(steering_norm) + sq(throttle_norm));
 
-        // limit magnitude to 1.0 by reducing throttle component while preserving steering component
-        // this will result in an increased angle to maintain linear angular rate response
-        if (magnitude > 1.0f) {
-            magnitude = 1.0f;
-            throttle_norm = sqrtf(1 - sq(steering_norm)) * throttle_sign;
-            limit.throttle_lower = true;
-            limit.throttle_upper = true;
-        }
-        // preserve thrust direction
-        magnitude *= throttle_sign;
-
-        float steering_angle_rad = 0;
-
-        if (!is_zero(throttle_norm)) {
-            // calculate steering angle
-            steering_angle_rad = atanf(steering_norm / throttle_norm);
-            // limit steering angle to vector_angle_max
-            if (fabsf(steering_angle_rad) > vector_angle_max_rad) {
-                steering_angle_rad = constrain_float(steering_angle_rad, -vector_angle_max_rad, vector_angle_max_rad);
-                limit.steer_right = true;
-                limit.steer_left = true;
+            // limit magnitude to 1.0 by reducing throttle component while preserving steering component
+            // this will result in an increased angle to maintain linear angular rate response
+            if (magnitude > 1.0f) {
+                magnitude = 1.0f;
+                throttle_norm = sqrtf(1 - sq(steering_norm)) * throttle_sign;
+                limit.throttle_lower = true;
+                limit.throttle_upper = true;
             }
-        } else if (!is_zero(steering_norm)) {
-            // Pivot turning with vectored thrust
-            steering_angle_rad = is_positive(steering_norm) ? vector_angle_max_rad : -vector_angle_max_rad;
-        }
+            // preserve thrust direction
+            magnitude *= throttle_sign;
 
-        // set swivel inputs
-        _swivel_throttle = magnitude * 100.0f;
-        _desired_swivel_angle = steering_angle_rad;
+            float steering_angle_rad = 0;
+            
+            if (!is_zero(throttle_norm)) {
+                // calculate steering angle
+                steering_angle_rad = atanf(steering_norm / throttle_norm);
+                // limit steering angle to vector_angle_max
+                if (fabsf(steering_angle_rad) > vector_angle_max_rad) {
+                    steering_angle_rad = constrain_float(steering_angle_rad, -vector_angle_max_rad, vector_angle_max_rad);
+                    limit.steer_right = true;
+                    limit.steer_left = true;
+                }
+            } else if (!is_zero(steering_norm)) {
+                // Pivot turning with vectored thrust
+                steering_angle_rad = is_positive(steering_norm) ? vector_angle_max_rad : -vector_angle_max_rad;
+            }
+
+            // set swivel inputs
+            _swivel_throttle = magnitude * 100.0f;
+            _desired_swivel_angle = steering_angle_rad;
+        } else {
+            // set swivel inputs
+            _swivel_throttle = throttle;
+            _desired_swivel_angle = steering * vector_angle_max_rad / 4500.0f;
+        }
     }
 }
 
