@@ -50,7 +50,7 @@ public:
 
     // get or set throttle as a value from -100 to 100
     float get_throttle() const { return _throttle; }
-    void set_throttle(float throttle);
+    void set_throttle(float throttle, bool is_braking = false);
 
     // get swivel state parameters
     float get_swivel_throttle() const { return _swivel_throttle; }
@@ -232,6 +232,7 @@ private:
     float   _desired_swivel_angle;    // desired angle of the swivel in radians
     float   _throttle_prev; // throttle input from previous iteration
     bool    _scale_steering = true; // true if we should scale steering by speed or angle
+    bool    _braking = false; // true if signs of desired speed and throttle do not match
     float   _lateral;  // requested lateral input as a value from -100 to +100
     float   _roll;      // requested roll as a value from -1 to +1
     float   _pitch;     // requested pitch as a value from -1 to +1

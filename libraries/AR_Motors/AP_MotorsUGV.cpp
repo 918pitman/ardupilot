@@ -230,7 +230,7 @@ void AP_MotorsUGV::set_steering(float steering, bool apply_scaling)
 }
 
 // set throttle as a value from -100 to 100
-void AP_MotorsUGV::set_throttle(float throttle)
+void AP_MotorsUGV::set_throttle(float throttle, bool is_braking)
 {
     // only allow setting throttle if armed
     if (!hal.util->get_soft_armed()) {
@@ -239,6 +239,7 @@ void AP_MotorsUGV::set_throttle(float throttle)
 
     // check throttle is between -_throttle_max and  +_throttle_max
     _throttle = constrain_float(throttle, -_throttle_max, _throttle_max);
+    _braking = is_braking;
 }
 
 // set lateral input as a value from -100 to +100
@@ -744,6 +745,11 @@ void AP_MotorsUGV::output_regular(bool armed, float ground_speed, float steering
             if (!is_zero(throttle_norm)) {
                 // calculate steering angle
                 steering_angle_rad = atanf(steering_norm / throttle_norm);
+                // due to vector calculation, we need to flip sign if braking
+                if (_braking) {
+                    steering_angle_rad *= -1.0f;
+                    _braking = false;
+                }
                 // limit steering angle to vector_angle_max
                 if (fabsf(steering_angle_rad) > vector_angle_max_rad) {
                     steering_angle_rad = constrain_float(steering_angle_rad, -vector_angle_max_rad, vector_angle_max_rad);
