@@ -328,10 +328,8 @@ void Mode::calc_throttle(float target_speed, bool avoidance_enabled)
         }
     }
 
-    // check if speed controller is attempting to brake
-    bool is_braking = (target_speed > 0.0f && throttle_out < 0.0f) || (target_speed < 0.0f && throttle_out > 0.0f);
     // send to motor
-    g2.motors.set_throttle(throttle_out, is_braking);
+    g2.motors.set_throttle(throttle_out);
 }
 
 // performs a controlled stop without turning
