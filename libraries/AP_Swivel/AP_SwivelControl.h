@@ -43,13 +43,13 @@ public:
     bool enabled();
 
     // Returns the steering output required to achieve desired Swivel angle
-    float get_swivel_position_correction(float target, float throttle, float dt);
+    float get_swivel_position_correction(float target, float &throttle, float dt);
 
     // get rate maximum in radians/sec
     float get_rate_max_rads() const { return MAX(_rate_max, 0.0f); }
 
     // get limit flag
-    bool is_limited() const { return _rate_limit || _pwm_limit; }
+    bool is_limited() const { return _error_limit || _rate_limit || _pwm_limit; }
 
     // get pid object for reporting
     AC_PID& get_pos_pid();
@@ -66,14 +66,14 @@ private:
     AP_Int8         _enabled;     // Swivel rate control enable/disable
     AP_Float        _wheelbase;   // Distance between Swivel and vehicle's center of rotation
     AP_Float        _trackwidth;  // Distance between Swivel's wheels
-    AP_Float        _error_limit; // Angle error threshold to set limit flag
+    AP_Float        _error_max;   // Angle error threshold to set limit flag
     AP_Float        _pwm_max;     // Swivel max steering output allowed for correcting angle
     AP_Float        _rate_max;    // Swivel max rotation rate
     AC_PID          _pos_pid{AP_SWIVEL_POS_P, AP_SWIVEL_POS_I, AP_SWIVEL_POS_D, AP_SWIVEL_POS_FF, AP_SWIVEL_POS_IMAX, AP_SWIVEL_POS_FILT, AP_SWIVEL_POS_FILT, AP_SWIVEL_POS_FILT, AP_SWIVEL_POS_DT};
     AC_PID          _rate_pid{AP_SWIVEL_RATE_P, AP_SWIVEL_RATE_I, AP_SWIVEL_RATE_D, AP_SWIVEL_RATE_FF, AP_SWIVEL_RATE_IMAX, AP_SWIVEL_RATE_FILT, AP_SWIVEL_RATE_FILT, AP_SWIVEL_RATE_FILT, AP_SWIVEL_RATE_DT};
 
     // limit flags
-    bool _rate_limit, _pwm_limit;
+    bool _error_limit, _rate_limit, _pwm_limit;
 
     // internal variables
     const AP_Swivel&        _swivel;     // pointer to accompanying swivel

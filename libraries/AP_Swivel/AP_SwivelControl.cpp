@@ -32,7 +32,7 @@ const AP_Param::GroupInfo AP_SwivelControl::var_info[] = {
     // @Units: degrees
     // @Range: 0 45.0
     // @User: Advanced
-    AP_GROUPINFO("_LIMIT", 4, AP_SwivelControl, _error_limit, 10),
+    AP_GROUPINFO("_LIMIT", 4, AP_SwivelControl, _error_max, 10),
 
     // @Param: _POS_FF
     // @DisplayName: Swivel position control feed forward gain
@@ -258,7 +258,7 @@ bool AP_SwivelControl::enabled()
 }
 
 // get steering output for correcting the swivel angle using rate control.
-float AP_SwivelControl::get_swivel_position_correction(float desired_angle, float throttle, float dt)
+float AP_SwivelControl::get_swivel_position_correction(float desired_angle, float &throttle, float dt)
 {
     if (!enabled()) {
         return 0;
@@ -283,12 +283,13 @@ float AP_SwivelControl::get_swivel_position_correction(float desired_angle, floa
     _swivel.get_rate(current_rate);
 
     // get desired rate using position PID
-    float desired_rate = _pos_pid.update_all(degrees(desired_angle), degrees(current_angle), dt, _rate_limit);
+    float desired_rate = _pos_pid.update_all(degrees(desired_angle), degrees(current_angle), dt, is_limited());
+    float error = _pos_pid.get_pid_info().error;
     desired_rate += _pos_pid.get_ff();
 
     // set limits for next iteration
-    _rate_limit = fabsf(_pos_pid.get_pid_info().error) >= _error_limit;
-
+    _error_limit =  fabsf(error) >= _error_max;
+    _rate_limit = fabsf(desired_rate) >= _rate_max;
     desired_rate = constrain_float(desired_rate, -_rate_max, _rate_max);
 
     // get desired pwm using rate PID
@@ -297,6 +298,9 @@ float AP_SwivelControl::get_swivel_position_correction(float desired_angle, floa
 
     // Temporary fix for flipped output
     output *= -1;
+
+    // Scale down swivel throttle to the cosine of the error, constrained to prevent sign flipping
+    throttle *= cosf(radians(constrain_float(error, -90.0f, 90.0f)));
 
     // Use current angle and throttle to determine torque vector
     float torque_vector = 0;
