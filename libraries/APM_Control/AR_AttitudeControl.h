@@ -121,6 +121,9 @@ public:
     // get latest desired speed recorded during call to get_throttle_out_speed.  For reporting purposes only
     float get_desired_speed() const;
 
+    // get latest throttle base recorded during call to get_throttle_out_speed.  For reporting purposes only
+    float get_throttle_base() const;
+
     // get acceleration limited desired speed
     float get_desired_speed_accel_limited(float desired_speed, float dt) const;
 
@@ -168,6 +171,7 @@ private:
     // throttle control
     uint32_t _speed_last_ms;        // system time of last call to get_throttle_out_speed
     float    _desired_speed;        // last recorded desired speed
+    float    _throttle_base;
     uint32_t _stop_last_ms;         // system time the vehicle was at a complete stop
     bool     _throttle_limit_low;   // throttle output was limited from going too low (used to reduce i-term buildup)
     bool     _throttle_limit_high;  // throttle output was limited from going too high (used to reduce i-term buildup)

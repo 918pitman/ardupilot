@@ -318,12 +318,13 @@ bool AP_MotorsUGV::has_sail() const
     return SRV_Channels::function_assigned(SRV_Channel::k_mainsail_sheet) || SRV_Channels::function_assigned(SRV_Channel::k_wingsail_elevator) || SRV_Channels::function_assigned(SRV_Channel::k_mast_rotation);
 }
 
-void AP_MotorsUGV::output(bool armed, float ground_speed, float dt)
+void AP_MotorsUGV::output(bool armed, float ground_speed, float throttle_base, float dt)
 {
     // soft-armed overrides passed in armed status
     if (!hal.util->get_soft_armed()) {
         armed = false;
         _throttle = 0.0f;
+        throttle_base = 0.0f;
     }
 
     // clear limit flags
@@ -337,29 +338,19 @@ void AP_MotorsUGV::output(bool armed, float ground_speed, float dt)
     slew_limit_throttle(dt);
 
     // output for regular steering/throttle style frames
-    output_regular(armed, ground_speed, _steering, _throttle);
+    output_regular(armed, ground_speed, _steering, _throttle, throttle_base);
 
-    if (have_swivel_steering()) {
-        // output for swivel steering style frames
-        AP_Swivel *swivel = AP::swivel();
-        swivel->get_angle(_actual_swivel_angle);
-        // Get the correction required to achieve desired angle
-        _swivel_steering = _swivel_controller.get_swivel_position_correction(_desired_swivel_angle, _swivel_throttle, dt);
-        if (_swivel_controller.is_limited()) {
-            limit.steer_left = limit.steer_right = limit.throttle_lower = limit.throttle_upper = true;
-        }
-        // send output to nested skid-steer mixer
-        output_skid_steering(armed, _swivel_steering, _swivel_throttle, dt);
-    } else {
-        // output for skid steering style frames
-        output_skid_steering(armed, _steering, _throttle, dt);
+    // output for swivel steering style frames
+    AP_Swivel *swivel = AP::swivel();
+    swivel->get_angle(_actual_swivel_angle);
+    // Get the correction required to achieve desired angle
+    _swivel_steering = _swivel_controller.get_swivel_position_correction(_desired_swivel_angle, _swivel_throttle, dt);
+    if (_swivel_controller.is_limited()) {
+        limit.steer_left = limit.steer_right = limit.throttle_lower = limit.throttle_upper = true;
     }
+    // send output to nested skid-steer mixer
+    output_skid_steering(armed, _swivel_steering, _swivel_throttle, dt);
 
-    // output for omni frames
-    output_omni(armed, _steering, _throttle, _lateral);
-
-    // output to sails
-    output_sail();
 
     // send values to the PWM timers for output
     SRV_Channels::calc_pwm();
@@ -714,7 +705,7 @@ void AP_MotorsUGV::clear_omni_motors(int8_t motor_num)
 }
 
 // output to regular steering and throttle channels
-void AP_MotorsUGV::output_regular(bool armed, float ground_speed, float steering, float throttle)
+void AP_MotorsUGV::output_regular(bool armed, float ground_speed, float steering, float throttle, float throttle_base)
 {
     // output to throttle channels
     if (armed) {
@@ -723,6 +714,7 @@ void AP_MotorsUGV::output_regular(bool armed, float ground_speed, float steering
             // normalise desired steering and throttle to ease calculations
             float steering_norm = steering / 4500.0f;
             float throttle_norm = throttle * 0.01f;
+            float throttle_base_norm = throttle_base * 0.01f;
             float throttle_sign = is_negative(throttle_norm) ? -1.0f : 1.0f;
 
             // get magnitude of throttle and steering components (thrust)
@@ -741,15 +733,9 @@ void AP_MotorsUGV::output_regular(bool armed, float ground_speed, float steering
 
             float steering_angle_rad = 0;
             
-            if (!is_zero(throttle_norm)) {
+            if (!is_zero(throttle_base_norm)) {
                 // calculate steering angle
-                steering_angle_rad = atanf(steering_norm / throttle_norm);
-                // limit steering angle to vector_angle_max
-                if (fabsf(steering_angle_rad) > vector_angle_max_rad) {
-                    steering_angle_rad = constrain_float(steering_angle_rad, -vector_angle_max_rad, vector_angle_max_rad);
-                    limit.steer_right = true;
-                    limit.steer_left = true;
-                }
+                steering_angle_rad = atanf(steering_norm / throttle_base_norm);
             } else if (!is_zero(steering_norm)) {
                 // Pivot turning with vectored thrust
                 steering_angle_rad = is_positive(steering_norm) ? vector_angle_max_rad : -vector_angle_max_rad;
