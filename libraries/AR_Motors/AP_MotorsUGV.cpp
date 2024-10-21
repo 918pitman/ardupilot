@@ -714,7 +714,6 @@ void AP_MotorsUGV::output_regular(bool armed, float ground_speed, float steering
             // normalise desired steering and throttle to ease calculations
             float steering_norm = steering / 4500.0f;
             float throttle_norm = throttle * 0.01f;
-            float throttle_base_norm = throttle_base * 0.01f;
             float throttle_sign = is_negative(throttle_norm) ? -1.0f : 1.0f;
 
             // get magnitude of throttle and steering components (thrust)
@@ -733,9 +732,9 @@ void AP_MotorsUGV::output_regular(bool armed, float ground_speed, float steering
 
             float steering_angle_rad = 0;
             
-            if (!is_zero(throttle_base_norm)) {
+            if (!is_zero(throttle_base)) {
                 // calculate steering angle
-                steering_angle_rad = atanf(steering_norm / throttle_base_norm);
+                steering_angle_rad = atanf(steering_norm / throttle_base);
             } else if (!is_zero(steering_norm)) {
                 // Pivot turning with vectored thrust
                 steering_angle_rad = is_positive(steering_norm) ? vector_angle_max_rad : -vector_angle_max_rad;
