@@ -716,27 +716,28 @@ void AP_MotorsUGV::output_regular(bool armed, float ground_speed, float steering
             float throttle_norm = throttle * 0.01f;
             float throttle_sign = is_negative(throttle_norm) ? -1.0f : 1.0f;
 
-            // get magnitude of throttle and steering components (thrust)
-            float magnitude = sqrtf(sq(steering_norm) + sq(throttle_norm));
-
-            // limit magnitude to 1.0 by reducing throttle component while preserving steering component
-            // this will result in an increased angle to maintain linear angular rate response
-            if (magnitude > 1.0f) {
-                magnitude = 1.0f;
-                throttle_norm = sqrtf(1 - sq(steering_norm)) * throttle_sign;
-                limit.throttle_lower = true;
-                limit.throttle_upper = true;
-            }
-            // preserve thrust direction
-            magnitude *= throttle_sign;
-
-            float steering_angle_rad = 0;
+            float magnitude = 0.0f;
+            float steering_angle_rad = 0.0f;
             
             if (!is_zero(throttle_base)) {
                 // calculate steering angle
+                // get magnitude of throttle and steering components (thrust)
+                magnitude = sqrtf(sq(steering_norm) + sq(throttle_norm));
+
+                // limit magnitude to 1.0 by reducing throttle component while preserving steering component
+                // this will result in an increased angle to maintain linear angular rate response
+                if (magnitude > 1.0f) {
+                    magnitude = 1.0f;
+                    throttle_norm = sqrtf(1 - sq(steering_norm)) * throttle_sign;
+                    limit.throttle_lower = true;
+                    limit.throttle_upper = true;
+                }
+                // preserve thrust direction
+                magnitude *= throttle_sign;
                 steering_angle_rad = atanf(steering_norm / throttle_base);
             } else if (!is_zero(steering_norm)) {
                 // Pivot turning with vectored thrust
+                magnitude = steering_norm;
                 steering_angle_rad = is_positive(steering_norm) ? vector_angle_max_rad : -vector_angle_max_rad;
             }
 
