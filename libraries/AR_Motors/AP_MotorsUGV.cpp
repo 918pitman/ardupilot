@@ -735,12 +735,11 @@ void AP_MotorsUGV::output_regular(bool armed, float ground_speed, float steering
                 // preserve thrust direction
                 magnitude *= throttle_sign;
                 steering_angle_rad = atanf(steering_norm / throttle_base);
+            } else if (!is_zero(steering_norm)) {
+                // Pivot turning with vectored thrust
+                magnitude = fabsf(steering_norm);
+                steering_angle_rad = is_positive(steering_norm) ? vector_angle_max_rad : -vector_angle_max_rad;
             }
-            // } else if (!is_zero(steering_norm)) {
-            //     // Pivot turning with vectored thrust
-            //     magnitude = fabsf(steering_norm);
-            //     steering_angle_rad = is_positive(steering_norm) ? vector_angle_max_rad : -vector_angle_max_rad;
-            // }
 
             // set swivel inputs
             _swivel_throttle = magnitude * 100.0f;
