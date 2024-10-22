@@ -719,7 +719,7 @@ void AP_MotorsUGV::output_regular(bool armed, float ground_speed, float steering
             float magnitude = 0.0f;
             float steering_angle_rad = 0.0f;
             
-            if (!is_zero(throttle_base)) {
+            if (!is_zero(throttle_base) && !is_zero(throttle_norm)) {
                 // calculate steering angle
                 // get magnitude of throttle and steering components (thrust)
                 magnitude = sqrtf(sq(steering_norm) + sq(throttle_norm));
