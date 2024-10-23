@@ -103,7 +103,7 @@ public:
     // output to motors and steering servos
     // ground_speed should be the vehicle's speed over the surface in m/s
     // dt should be expected time between calls to this function
-    void output(bool armed, float ground_speed, float throttle_base, float dt);
+    void output(bool armed, float ground_speed, float throttle_base, float desired_turn_rate, float dt);
 
     // test steering or throttle output as a percentage of the total (range -100 to +100)
     // used in response to DO_MOTOR_TEST mavlink command
@@ -169,9 +169,6 @@ private:
 
     // disable omni motor and remove all throttle, steering and lateral factor for this motor
     void clear_omni_motors(int8_t motor_num);
-
-    // output to regular steering and throttle channels
-    void output_regular(bool armed, float ground_speed, float steering, float throttle, float throttle_base);
 
     // output to skid steering channels
     void output_skid_steering(bool armed, float steering, float throttle, float dt);
