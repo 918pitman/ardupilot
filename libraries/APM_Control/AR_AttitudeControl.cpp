@@ -696,16 +696,7 @@ float AR_AttitudeControl::get_steering_out_rate(float desired_rate, bool motor_l
     // update pid to calculate output to motors
     float output = _steer_rate_pid.update_all(_desired_turn_rate, AP::ahrs().get_yaw_rate_earth(), dt, (motor_limit_left || motor_limit_right));
     output += _steer_rate_pid.get_ff();
-
     // constrain and return final output
-    if ((_desired_turn_rate >= 0.0f) && (output <= 0.0f)) {
-        output = 0.0f;
-        motor_limit_right = true;
-    } else if ((_desired_turn_rate <= 0.0f) && (output >= 0.0f)) {
-        output = 0.0f;
-        motor_limit_left = true;
-    }
-
     return output;
 }
 
