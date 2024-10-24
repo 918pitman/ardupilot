@@ -103,7 +103,7 @@ public:
     // output to motors and steering servos
     // ground_speed should be the vehicle's speed over the surface in m/s
     // dt should be expected time between calls to this function
-    void output(bool armed, float ground_speed, float throttle_base, float desired_turn_rate, float dt);
+    void output(bool armed, float ground_speed, float desired_throttle, float desired_turn_rate, float dt);
 
     // test steering or throttle output as a percentage of the total (range -100 to +100)
     // used in response to DO_MOTOR_TEST mavlink command

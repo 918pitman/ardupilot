@@ -318,7 +318,7 @@ bool AP_MotorsUGV::has_sail() const
     return SRV_Channels::function_assigned(SRV_Channel::k_mainsail_sheet) || SRV_Channels::function_assigned(SRV_Channel::k_wingsail_elevator) || SRV_Channels::function_assigned(SRV_Channel::k_mast_rotation);
 }
 
-void AP_MotorsUGV::output(bool armed, float ground_speed, float throttle_base, float desired_turn_rate, float dt)
+void AP_MotorsUGV::output(bool armed, float ground_speed, float desired_speed, float desired_turn_rate, float dt)
 {
     // soft-armed overrides passed in armed status
     if (!hal.util->get_soft_armed()) {
@@ -347,6 +347,15 @@ void AP_MotorsUGV::output(bool armed, float ground_speed, float throttle_base, f
             float throttle_sign = (throttle_norm < 0.0f) ? -1.0f : 1.0f;
             float magnitude = 0.0f;
             float steering_angle_rad = 0.0f;
+
+            if (!is_zero(desired_speed)){
+                float speed_for_angle = (fabsf(ground_speed) > 0.1) : ground_speed : desired_speed;
+                steering_angle_rad = atanf((desired_turn_rate * 0.775) / speed_for_angle);
+            } else if (!is_zero(desired_turn_rate)) {
+                magnitude = is_positive(desired_turn_rate) ? steering_norm : -steering_norm;
+                steering_angle_rad = is_positive(desired_turn_rate) ? vector_angle_max_rad : -vector_angle_max_rad;
+            }
+
             
             if (!is_zero(throttle_base) && !is_zero(throttle_norm)) {
                 // calculate steering angle
@@ -363,12 +372,6 @@ void AP_MotorsUGV::output(bool armed, float ground_speed, float throttle_base, f
                 }
                 // preserve thrust direction
                 magnitude *= throttle_sign;
-                steering_angle_rad = atanf((steering_norm * _speed_scale_base) / throttle_base);
-            } else if (!is_zero(desired_turn_rate)) {
-                // Pivot turning with vectored thrust
-                magnitude = is_positive(desired_turn_rate) ? steering_norm : -steering_norm;
-                steering_angle_rad = is_positive(desired_turn_rate) ? vector_angle_max_rad : -vector_angle_max_rad;
-            }
 
             // set swivel inputs
             _swivel_throttle = magnitude * 100.0f;
