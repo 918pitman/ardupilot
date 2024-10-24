@@ -367,7 +367,7 @@ void AP_MotorsUGV::output(bool armed, float ground_speed, float desired_speed, f
                     // determine error of measured angle and effective angle
                     float angle_error = _actual_swivel_angle - effective_swivel_angle;
                     _swivel_trim = constrain_float(_swivel_trim + (angle_error * dt), -10.0f, 10.0f);
-
+                }
                 desired_swivel_angle = atanf((desired_turn_rate * 0.775) / current_speed);
                 
             } else if (!is_zero(desired_turn_rate)) {
