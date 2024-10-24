@@ -281,9 +281,10 @@ float AP_SwivelControl::get_swivel_position_correction(float desired_angle, floa
     float current_rate = 0; 
     _swivel.get_angle(current_angle);
     _swivel.get_rate(current_rate);
-
+    desired_angle = constrain_float(degrees(desired_angle), -90.0f, 90.0f);
+    
     // get desired rate using position PID
-    float desired_rate = _pos_pid.update_all(degrees(desired_angle), degrees(current_angle), dt, is_limited());
+    float desired_rate = _pos_pid.update_all(desired_angle, degrees(current_angle), dt, is_limited());
     float error = _pos_pid.get_pid_info().error;
     desired_rate += _pos_pid.get_ff();
 

@@ -318,13 +318,12 @@ bool AP_MotorsUGV::has_sail() const
     return SRV_Channels::function_assigned(SRV_Channel::k_mainsail_sheet) || SRV_Channels::function_assigned(SRV_Channel::k_wingsail_elevator) || SRV_Channels::function_assigned(SRV_Channel::k_mast_rotation);
 }
 
-void AP_MotorsUGV::output(bool armed, float ground_speed, float desired_speed, float desired_turn_rate, float dt)
+void AP_MotorsUGV::output(bool armed, float ground_speed, float desired_speed, float desired_turn_rate, float turn_rate, float dt)
 {
     // soft-armed overrides passed in armed status
     if (!hal.util->get_soft_armed()) {
         armed = false;
         _throttle = 0.0f;
-        throttle_base = 0.0f;
     }
 
     // clear limit flags
@@ -337,6 +336,9 @@ void AP_MotorsUGV::output(bool armed, float ground_speed, float desired_speed, f
     // slew limit throttle
     slew_limit_throttle(dt);
 
+    // output for swivel steering style frames
+    AP_Swivel *swivel = AP::swivel();
+
     // output to throttle channels
     if (armed) {
         const float vector_angle_max_rad = radians(constrain_float(_vector_angle_max, 0.0f, 90.0f));
@@ -346,24 +348,33 @@ void AP_MotorsUGV::output(bool armed, float ground_speed, float desired_speed, f
             float throttle_norm = _throttle * 0.01f;
             float throttle_sign = (throttle_norm < 0.0f) ? -1.0f : 1.0f;
             float magnitude = 0.0f;
-            float steering_angle_rad = 0.0f;
 
-            if (!is_zero(desired_speed)){
-                float speed_for_angle = (fabsf(ground_speed) > 0.1) : ground_speed : desired_speed;
-                steering_angle_rad = atanf((desired_turn_rate * 0.775) / speed_for_angle);
-            } else if (!is_zero(desired_turn_rate)) {
-                magnitude = is_positive(desired_turn_rate) ? steering_norm : -steering_norm;
-                steering_angle_rad = is_positive(desired_turn_rate) ? vector_angle_max_rad : -vector_angle_max_rad;
-            }
+            // the angle the swivel must be at to achieve a turn rate given an actual speed
+            float desired_swivel_angle = 0.0f;
+            // the angle of swivel as measured by hall sensor
+            float measured_angle;
+            swivel->get_angle(measured_angle);
+            // apply trim value
+            _actual_swivel_angle = measured_angle + _swivel_trim;
 
-            
-            if (!is_zero(throttle_base) && !is_zero(throttle_norm)) {
-                // calculate steering angle
+            if (!is_zero(desired_speed)) {
+                if (fabsf(ground_speed) > 0.25f) {
+                    // we have enough speed to accurately pick a desired swivel angle and integrate trim
+                    desired_swivel_angle = atanf((desired_turn_rate * 0.775) / ground_speed);
+                    // the angle of swivel as calculated directly based on vehicle attitude
+                    float effective_swivel_angle = atanf((turn_rate * 0.775) / ground_speed);
+                    // determine error of measured angle and effective angle
+                    float angle_error = _actual_swivel_angle - effective_swivel_angle;
+                    _swivel_trim = constrain_float(_swivel_trim + (angle_error * dt), -10.0f, 10.0f);
+                } else {
+                    // use desired speed if real speed is too low to avoid noise
+                    desired_swivel_angle = atanf((desired_turn_rate * 0.775) / desired_speed);
+                }
+
                 // get magnitude of throttle and steering components (thrust)
                 magnitude = sqrtf(sq(steering_norm) + sq(throttle_norm));
 
                 // limit magnitude to 1.0 by reducing throttle component while preserving steering component
-                // this will result in an increased angle to maintain linear angular rate response
                 if (magnitude > 1.0f) {
                     magnitude = 1.0f;
                     throttle_norm = sqrtf(1 - sq(steering_norm)) * throttle_sign;
@@ -373,9 +384,14 @@ void AP_MotorsUGV::output(bool armed, float ground_speed, float desired_speed, f
                 // preserve thrust direction
                 magnitude *= throttle_sign;
 
+            } else if (!is_zero(desired_turn_rate)) {
+                desired_swivel_angle = is_positive(desired_turn_rate) ? vector_angle_max_rad : -vector_angle_max_rad;
+                magnitude = is_positive(desired_turn_rate) ? steering_norm : -steering_norm;
+            }
+
             // set swivel inputs
             _swivel_throttle = magnitude * 100.0f;
-            _desired_swivel_angle = steering_angle_rad;
+            _desired_swivel_angle = desired_swivel_angle;
         } else {
             // set swivel inputs
             _swivel_throttle = _throttle;
@@ -383,11 +399,8 @@ void AP_MotorsUGV::output(bool armed, float ground_speed, float desired_speed, f
         }
     }
 
-    // output for swivel steering style frames
-    AP_Swivel *swivel = AP::swivel();
-    swivel->get_angle(_actual_swivel_angle);
     // Get the correction required to achieve desired angle
-    _swivel_steering = _swivel_controller.get_swivel_position_correction(_desired_swivel_angle, _swivel_throttle, dt);
+    _swivel_steering = _swivel_controller.get_swivel_position_correction(_desired_swivel_angle + _swivel_trim, _swivel_throttle, dt);
     if (_swivel_controller.is_limited()) {
         limit.steer_left = limit.steer_right = limit.throttle_lower = limit.throttle_upper = true;
     }

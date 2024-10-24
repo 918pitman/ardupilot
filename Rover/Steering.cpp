@@ -15,6 +15,6 @@ void Rover::set_servos(void)
             speed = 0.0f;
         }
 
-        g2.motors.output(arming.is_armed(), speed, g2.attitude_control.get_desired_speed(), g2.attitude_control.get_desired_turn_rate(), G_Dt);
+        g2.motors.output(arming.is_armed(), speed, g2.attitude_control.get_desired_speed(), g2.attitude_control.get_desired_turn_rate(), g2.attitude_control.get_turn_rate(), G_Dt);
     }
 }

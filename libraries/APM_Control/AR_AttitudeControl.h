@@ -109,6 +109,9 @@ public:
     // get forward speed in m/s (earth-frame horizontal velocity but only along vehicle x-axis).  returns true on success
     bool get_forward_speed(float &speed) const;
 
+    // get throttle/speed controller maximum deceleration
+    float get_turn_rate() const;
+
     // get throttle/speed controller maximum acceleration (also used for deceleration)
     float get_accel_max() const { return MAX(_throttle_accel_max, 0.0f); }
 
