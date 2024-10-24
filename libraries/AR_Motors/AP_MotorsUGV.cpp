@@ -338,6 +338,11 @@ void AP_MotorsUGV::output(bool armed, float ground_speed, float desired_speed, f
 
     // output for swivel steering style frames
     AP_Swivel *swivel = AP::swivel();
+    // the angle of swivel as measured by hall sensor
+    float measured_angle;
+    swivel->get_angle(measured_angle);
+    // apply trim value
+    _actual_swivel_angle = measured_angle + _swivel_trim;
 
     // output to throttle channels
     if (armed) {
@@ -346,47 +351,27 @@ void AP_MotorsUGV::output(bool armed, float ground_speed, float desired_speed, f
             // normalise desired steering and throttle to ease calculations
             float steering_norm = _steering / 4500.0f;
             float throttle_norm = _throttle * 0.01f;
-            float throttle_sign = (throttle_norm < 0.0f) ? -1.0f : 1.0f;
-            float magnitude = 0.0f;
 
+            // the amount of thrust to send to swivel
+            float magnitude = steering_norm * sinf(_actual_swivel_angle) + throttle_norm * cosf(_actual_swivel_angle);
             // the angle the swivel must be at to achieve a turn rate given an actual speed
             float desired_swivel_angle = 0.0f;
-            // the angle of swivel as measured by hall sensor
-            float measured_angle;
-            swivel->get_angle(measured_angle);
-            // apply trim value
-            _actual_swivel_angle = measured_angle + _swivel_trim;
 
             if (!is_zero(desired_speed)) {
+                float current_speed = desired_speed;
                 if (fabsf(ground_speed) > 0.25f) {
-                    // we have enough speed to accurately pick a desired swivel angle and integrate trim
-                    desired_swivel_angle = atanf((desired_turn_rate * 0.775) / ground_speed);
+                    // we have enough speed to accurately integrate trim
+                    current_speed = ground_speed;
                     // the angle of swivel as calculated directly based on vehicle attitude
                     float effective_swivel_angle = atanf((turn_rate * 0.775) / ground_speed);
                     // determine error of measured angle and effective angle
                     float angle_error = _actual_swivel_angle - effective_swivel_angle;
                     _swivel_trim = constrain_float(_swivel_trim + (angle_error * dt), -10.0f, 10.0f);
-                } else {
-                    // use desired speed if real speed is too low to avoid noise
-                    desired_swivel_angle = atanf((desired_turn_rate * 0.775) / desired_speed);
-                }
 
-                // get magnitude of throttle and steering components (thrust)
-                magnitude = sqrtf(sq(steering_norm) + sq(throttle_norm));
-
-                // limit magnitude to 1.0 by reducing throttle component while preserving steering component
-                if (magnitude > 1.0f) {
-                    magnitude = 1.0f;
-                    throttle_norm = sqrtf(1 - sq(steering_norm)) * throttle_sign;
-                    limit.throttle_lower = true;
-                    limit.throttle_upper = true;
-                }
-                // preserve thrust direction
-                magnitude *= throttle_sign;
-
+                desired_swivel_angle = atanf((desired_turn_rate * 0.775) / current_speed);
+                
             } else if (!is_zero(desired_turn_rate)) {
                 desired_swivel_angle = is_positive(desired_turn_rate) ? vector_angle_max_rad : -vector_angle_max_rad;
-                magnitude = is_positive(desired_turn_rate) ? steering_norm : -steering_norm;
             }
 
             // set swivel inputs
