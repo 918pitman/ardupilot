@@ -342,7 +342,8 @@ void AP_MotorsUGV::output(bool armed, float ground_speed, float desired_speed, f
     float measured_angle;
     swivel->get_angle(measured_angle);
     // apply trim value
-    _actual_swivel_angle = measured_angle + _swivel_trim;
+    _actual_swivel_angle = measured_angle;
+    _swivel_trim = atanf((turn_rate * 0.775) / ground_speed);
 
     // output to throttle channels
     if (armed) {
@@ -363,10 +364,10 @@ void AP_MotorsUGV::output(bool armed, float ground_speed, float desired_speed, f
                     // we have enough speed to accurately integrate trim
                     current_speed = ground_speed;
                     // the angle of swivel as calculated directly based on vehicle attitude
-                    float effective_swivel_angle = atanf((turn_rate * 0.775) / ground_speed);
+                    // float effective_swivel_angle = atanf((turn_rate * 0.775) / ground_speed);
                     // determine error of measured angle and effective angle
-                    float angle_error = _actual_swivel_angle - effective_swivel_angle;
-                    _swivel_trim = constrain_float(_swivel_trim + (angle_error * dt), -10.0f, 10.0f);
+                    // float angle_error = _actual_swivel_angle - effective_swivel_angle;
+                    // _swivel_trim = constrain_float(_swivel_trim + (angle_error * dt), -10.0f, 10.0f);
                 }
                 desired_swivel_angle = atanf((desired_turn_rate * 0.775) / current_speed);
                 
@@ -385,7 +386,7 @@ void AP_MotorsUGV::output(bool armed, float ground_speed, float desired_speed, f
     }
 
     // Get the correction required to achieve desired angle
-    _swivel_steering = _swivel_controller.get_swivel_position_correction(_desired_swivel_angle + _swivel_trim, _swivel_throttle, dt);
+    _swivel_steering = _swivel_controller.get_swivel_position_correction(_desired_swivel_angle, _swivel_throttle, dt);
     if (_swivel_controller.is_limited()) {
         limit.steer_left = limit.steer_right = limit.throttle_lower = limit.throttle_upper = true;
     }
